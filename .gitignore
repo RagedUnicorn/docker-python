@@ -1,0 +1,26 @@
+# IDE
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Build artifacts
+*.log
+build/
+dist/
+target/
+
+# Local environment
+.env.local
+.env.*.local
+
+# Docker
+.docker/
