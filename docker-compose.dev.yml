@@ -1,0 +1,30 @@
+# Docker Compose configuration for Python development
+#
+# This configuration extends the base build with development-specific settings
+#
+# Usage:
+#   docker compose -f docker-compose.dev.yml build     # Build dev image
+#   docker compose -f docker-compose.dev.yml up -d     # Start dev container
+#   docker compose -f docker-compose.dev.yml exec python bash  # Get shell
+#
+# Features:
+#   - Mounts the entire project for live editing
+#   - Keeps container running for interactive development
+#   - Exposes common development ports
+
+services:
+  python:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BUILD_DATE: ${BUILD_DATE:-dev}
+        VERSION: ${VERSION:-dev}
+    volumes:
+      - .:/app
+    stdin_open: true
+    tty: true
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PYTHONDONTWRITEBYTECODE=1
+      - TERM=xterm-256color
