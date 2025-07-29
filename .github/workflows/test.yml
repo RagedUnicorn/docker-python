@@ -1,0 +1,128 @@
+name: Test
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build Python image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true
+          tags: ragedunicorn/python:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            BUILD_DATE=${{ github.event.repository.updated_at }}
+            VERSION=test
+      - name: Pull Container Structure Test image
+        run: docker pull ragedunicorn/container-test:latest
+      - name: Run File Structure Tests
+        id: file-tests
+        continue-on-error: true
+        env:
+          PYTHON_VERSION: test
+        run: |
+          echo "::group::📁 File Structure Tests"
+          docker compose -f docker-compose.test.yml up --exit-code-from container-test container-test 2>&1 | tee test-file-structure.log
+          echo "::endgroup::"
+      - name: Run Command Execution Tests
+        id: command-tests
+        continue-on-error: true
+        env:
+          PYTHON_VERSION: test
+        run: |
+          echo "::group::🔧 Command Execution Tests"
+          docker compose -f docker-compose.test.yml up --exit-code-from container-test-command container-test-command 2>&1 | tee test-command-execution.log
+          echo "::endgroup::"
+      - name: Run Metadata Tests
+        id: metadata-tests
+        continue-on-error: true
+        env:
+          PYTHON_VERSION: test
+        run: |
+          echo "::group::🏷️ Metadata Tests"
+          docker compose -f docker-compose.test.yml up --exit-code-from container-test-metadata container-test-metadata 2>&1 | tee test-metadata.log
+          echo "::endgroup::"
+      - name: Test basic Python functionality
+        id: basic-tests
+        continue-on-error: true
+        run: |
+          echo "::group::🐍 Basic Python Functionality Test"
+          {
+            echo "Testing Python version..."
+            docker run --rm ragedunicorn/python:test --version
+            echo ""
+            echo "Testing pip functionality..."
+            docker run --rm ragedunicorn/python:test -m pip --version
+            echo ""
+            echo "Testing basic execution..."
+            docker run --rm ragedunicorn/python:test -c "print('Hello from Python!')"
+          } 2>&1 | tee test-basic-functionality.log
+          echo "::endgroup::"
+      - name: Generate Test Summary
+        if: always()
+        run: |
+          echo "## 📊 Test Results Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Test Suite | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------------|--------|" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ steps.file-tests.outcome }}" == "success" ]; then
+            echo "| 📁 File Structure | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| 📁 File Structure | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ "${{ steps.command-tests.outcome }}" == "success" ]; then
+            echo "| 🔧 Command Execution | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| 🔧 Command Execution | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ "${{ steps.metadata-tests.outcome }}" == "success" ]; then
+            echo "| 🏷️ Metadata | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| 🏷️ Metadata | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ "${{ steps.basic-tests.outcome }}" == "success" ]; then
+            echo "| 🐍 Basic Functionality | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| 🐍 Basic Functionality | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Overall status
+          if [ "${{ steps.file-tests.outcome }}" == "success" ] && \
+             [ "${{ steps.command-tests.outcome }}" == "success" ] && \
+             [ "${{ steps.metadata-tests.outcome }}" == "success" ] && \
+             [ "${{ steps.basic-tests.outcome }}" == "success" ]; then
+            echo "### ✅ All tests passed successfully!" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### ❌ Some tests failed. Check the logs for details." >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+      - name: Upload test logs
+        if: always() && (steps.file-tests.outcome == 'failure' || steps.command-tests.outcome == 'failure' || steps.metadata-tests.outcome == 'failure' || steps.basic-tests.outcome == 'failure')
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs
+          path: |
+            test-file-structure.log
+            test-command-execution.log
+            test-metadata.log
+            test-basic-functionality.log
+          retention-days: 7

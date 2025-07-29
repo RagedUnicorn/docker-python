@@ -1,0 +1,70 @@
+name: Create GitHub Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Get previous tag
+        id: prev_tag
+        run: |
+          PREV_TAG=$(git describe --tags --abbrev=0 $(git rev-list --tags --skip=1 --max-count=1) 2>/dev/null || echo "")
+          echo "previous_tag=$PREV_TAG" >> $GITHUB_OUTPUT
+      - name: Generate changelog
+        id: changelog
+        run: |
+          if [ -z "${{ steps.prev_tag.outputs.previous_tag }}" ]; then
+            COMMITS=$(git log --pretty=format:"- %s (%h)" --reverse)
+          else
+            COMMITS=$(git log ${{ steps.prev_tag.outputs.previous_tag }}..${{ github.ref_name }} --pretty=format:"- %s (%h)" --reverse)
+          fi
+
+          # Create changelog
+          {
+            echo "## What's Changed"
+            echo ""
+            echo "$COMMITS" | grep -E "^- (feat|fix|docs|style|refactor|perf|test|chore)(\(.+\))?:" || echo "$COMMITS"
+            echo ""
+            echo "## Docker Image"
+            echo ""
+            echo "Pull the image:"
+            echo '```bash'
+            echo "docker pull ghcr.io/${{ github.repository }}:${GITHUB_REF_NAME#v}"
+            echo "docker pull ${{ secrets.DOCKERHUB_USERNAME }}/python:${GITHUB_REF_NAME#v}"
+            echo '```'
+            echo ""
+            echo "Or use the latest tag:"
+            echo '```bash'
+            echo "docker pull ghcr.io/${{ github.repository }}:latest"
+            echo "docker pull ${{ secrets.DOCKERHUB_USERNAME }}/python:latest"
+            echo '```'
+            echo ""
+            echo "**Full Changelog**: https://github.com/${{ github.repository }}/compare/${{ steps.prev_tag.outputs.previous_tag }}...${{ github.ref_name }}"
+          } > CHANGELOG.md
+
+          # Store for release body
+          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          echo "body<<$EOF" >> $GITHUB_OUTPUT
+          cat CHANGELOG.md >> $GITHUB_OUTPUT
+          echo "$EOF" >> $GITHUB_OUTPUT
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ github.ref_name }}
+          body_path: CHANGELOG.md
+          draft: false
+          prerelease: ${{ contains(github.ref_name, '-rc') || contains(github.ref_name, '-beta') || contains(github.ref_name, '-alpha') }}
+          generate_release_notes: false
+          token: ${{ secrets.GITHUB_TOKEN }}
