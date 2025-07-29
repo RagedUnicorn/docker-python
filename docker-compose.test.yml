@@ -1,0 +1,61 @@
+# Docker Compose configuration for running Container Structure Tests
+#
+# Usage:
+#   docker-compose -f docker-compose.test.yml up
+#   docker-compose -f docker-compose.test.yml run test-all
+#
+# This will validate the Python Docker image structure, commands, and metadata
+
+services:
+  # Test file existence and permissions
+  container-test:
+    image: ragedunicorn/container-test:${CONTAINER_STRUCTURE_TEST_VERSION:-latest}
+    volumes:
+      - ./test/:/test:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: ["--image", "ragedunicorn/python:${PYTHON_VERSION:-latest}", "--config", "/test/python_test.yml"]
+    labels:
+      org.opencontainers.image.title: "Container Structure Test - File Tests"
+      org.opencontainers.image.description: "Validating Python file structure and permissions"
+      org.opencontainers.image.vendor: "ragedunicorn"
+
+  # Test image metadata and labels
+  container-test-metadata:
+    image: ragedunicorn/container-test:${CONTAINER_STRUCTURE_TEST_VERSION:-latest}
+    volumes:
+      - ./test/:/test:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: ["--image", "ragedunicorn/python:${PYTHON_VERSION:-latest}", "--config", "/test/python_metadata_test.yml"]
+    labels:
+      org.opencontainers.image.title: "Container Structure Test - Metadata Tests"
+      org.opencontainers.image.description: "Validating Python image metadata and OCI labels"
+      org.opencontainers.image.vendor: "ragedunicorn"
+
+  # Test command execution and Python functionality
+  container-test-command:
+    image: ragedunicorn/container-test:${CONTAINER_STRUCTURE_TEST_VERSION:-latest}
+    volumes:
+      - ./test/:/test:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: [ "--image", "ragedunicorn/python:${PYTHON_VERSION:-latest}", "--config", "/test/python_command_test.yml" ]
+    labels:
+      org.opencontainers.image.title: "Container Structure Test - Command Tests"
+      org.opencontainers.image.description: "Validating Python command execution and functionality"
+      org.opencontainers.image.vendor: "ragedunicorn"
+
+  # Run all tests sequentially
+  test-all:
+    image: ragedunicorn/container-test:${CONTAINER_STRUCTURE_TEST_VERSION:-latest}
+    volumes:
+      - ./test/:/test:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    entrypoint: /bin/sh
+    command: >
+      -c "echo 'Running all Container Structure Tests for Python...' &&
+          container-structure-test test --image ragedunicorn/python:${PYTHON_VERSION:-latest} --config /test/python_test.yml &&
+          echo '✓ File structure tests passed' &&
+          container-structure-test test --image ragedunicorn/python:${PYTHON_VERSION:-latest} --config /test/python_command_test.yml &&
+          echo '✓ Command execution tests passed' &&
+          container-structure-test test --image ragedunicorn/python:${PYTHON_VERSION:-latest} --config /test/python_metadata_test.yml &&
+          echo '✓ Metadata validation tests passed' &&
+          echo && echo '✅ All Python container tests completed successfully!'"

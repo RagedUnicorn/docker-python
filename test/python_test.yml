@@ -1,0 +1,41 @@
+schemaVersion: 2.0.0
+
+fileExistenceTests:
+  - name: 'Python binary exists'
+    path: '/usr/bin/python3'
+    shouldExist: true
+    permissions: 'Lrwxrwxrwx'
+
+  - name: 'Python symlink exists'
+    path: '/usr/bin/python'
+    shouldExist: true
+    permissions: 'Lrwxrwxrwx'
+
+  - name: 'Pip binary exists'
+    path: '/usr/bin/pip3'
+    shouldExist: true
+    permissions: '-rwxr-xr-x'
+
+  - name: 'Working directory exists'
+    path: '/app'
+    shouldExist: true
+    isExecutableBy: 'any'
+
+  # Core Python libraries (Alpine packages)
+  - name: 'Python standard library exists'
+    path: '/usr/lib/python3.12'
+    shouldExist: true
+
+  - name: 'Python site-packages exists'
+    path: '/usr/lib/python3.12/site-packages'
+    shouldExist: true
+
+  - name: 'SSL certificates for pip'
+    path: '/etc/ssl/certs/ca-certificates.crt'
+    shouldExist: true
+
+fileContentTests:
+  - name: 'CA certificates installed'
+    path: '/etc/ssl/certs/ca-certificates.crt'
+    expectedContents: ['-----BEGIN CERTIFICATE-----']
+

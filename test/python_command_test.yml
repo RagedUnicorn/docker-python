@@ -1,0 +1,88 @@
+schemaVersion: 2.0.0
+
+commandTests:
+  - name: 'Python version check'
+    command: 'python'
+    args: ['--version']
+    expectedOutput:
+      - 'Python 3.12'
+    exitCode: 0
+
+  - name: 'Python3 version check'
+    command: 'python3'
+    args: ['--version']
+    expectedOutput:
+      - 'Python 3.12'
+    exitCode: 0
+
+  - name: 'Pip version check'
+    command: 'pip'
+    args: ['--version']
+    expectedOutput:
+      - 'pip'
+      - 'python 3.12'
+    exitCode: 0
+
+  - name: 'Pip3 version check'
+    command: 'pip3'
+    args: ['--version']
+    expectedOutput:
+      - 'pip'
+      - 'python 3.12'
+    exitCode: 0
+
+  - name: 'List installed packages'
+    command: 'pip'
+    args: ['list']
+    expectedOutput:
+      - 'pip'
+    exitCode: 0
+
+  - name: 'Python basic execution'
+    command: 'python'
+    args: ['-c', 'print("Hello, World!")']
+    expectedOutput:
+      - 'Hello, World!'
+    exitCode: 0
+
+  - name: 'Python import sys'
+    command: 'python'
+    args: ['-c', 'import sys; print(sys.version_info.major)']
+    expectedOutput:
+      - '3'
+    exitCode: 0
+
+  - name: 'Python import os'
+    command: 'python'
+    args: ['-c', 'import os; print("OS module works")']
+    expectedOutput:
+      - 'OS module works'
+    exitCode: 0
+
+  - name: 'Python import json'
+    command: 'python'
+    args: ['-c', 'import json; print("JSON module works")']
+    expectedOutput:
+      - 'JSON module works'
+    exitCode: 0
+
+  - name: 'Test script execution'
+    setup: [['sh', '-c', 'echo "print(\"Script executed\")" > /app/test.py']]
+    command: 'python'
+    args: ['/app/test.py']
+    expectedOutput: ['Script executed']
+    exitCode: 0
+
+  - name: 'Non-root user exists'
+    command: 'id'
+    args: ['python']
+    exitCode: 0
+    expectedOutput:
+      - 'uid='
+      - 'python'
+
+  - name: 'Check working directory'
+    command: 'pwd'
+    args: []
+    expectedOutput: ['/app']
+    exitCode: 0

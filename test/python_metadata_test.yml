@@ -1,0 +1,22 @@
+schemaVersion: 2.0.0
+
+metadataTest:
+  # OCI labels - These match values defined in the Dockerfile
+  labels:
+    - key: 'org.opencontainers.image.vendor'
+      value: 'ragedunicorn'
+    - key: 'org.opencontainers.image.authors'
+      value: 'Michael Wiesendanger <michael.wiesendanger@gmail.com>'
+    - key: 'org.opencontainers.image.source'
+      value: 'https://github.com/ragedunicorn/docker-python'
+    - key: 'org.opencontainers.image.documentation'
+      value: 'https://github.com/ragedunicorn/docker-python/blob/master/README.md'
+    - key: 'org.opencontainers.image.licenses'
+      value: 'MIT'
+    - key: 'org.opencontainers.image.base.name'
+      value: 'docker.io/library/alpine:3.21'
+
+  entrypoint: ['python']
+  cmd: ['-i']
+  workdir: '/app'
+  user: 'python'
