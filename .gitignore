@@ -1,26 +1,21 @@
-# IDE
-.idea/
-.vscode/
-*.iml
-*.ipr
-*.iws
+# Python
+__pycache__/
+*.py[cod]
+*.pyc
 
-# OS
+# Environment files
+.env.local
+
+# OS files
 .DS_Store
 Thumbs.db
-*.swp
-*.swo
-*~
 
-# Build artifacts
+# Temporary files
+*.tmp
 *.log
-build/
-dist/
-target/
 
-# Local environment
-.env.local
-.env.*.local
-
-# Docker
-.docker/
+# IDE files
+.vscode/
+.idea/
+*.swp
+*~
