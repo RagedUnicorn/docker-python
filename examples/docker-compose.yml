@@ -1,0 +1,31 @@
+# Simple docker-compose example for running Python scripts
+#
+# Usage:
+#   docker-compose run --rm hello-world
+#   docker-compose run --rm python-shell
+#   docker-compose run --rm python hello-world.py
+
+services:
+  # Run the hello world example
+  hello-world:
+    image: ragedunicorn/python:${PYTHON_VERSION:-latest}
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: ["hello-world.py"]
+
+  # Interactive Python shell
+  python-shell:
+    image: ragedunicorn/python:${PYTHON_VERSION:-latest}
+    volumes:
+      - .:/app
+    working_dir: /app
+    stdin_open: true
+    tty: true
+
+  # General Python service for running any script
+  python:
+    image: ragedunicorn/python:${PYTHON_VERSION:-latest}
+    volumes:
+      - .:/app
+    working_dir: /app
