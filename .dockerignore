@@ -1,41 +1,103 @@
-# Git
+# Git files
 .git
 .gitignore
 .gitattributes
 
 # Documentation
 *.md
-LICENSE*
 docs/
+LICENSE*
 
 # CI/CD
 .github/
 .gitlab-ci.yml
 .travis.yml
+azure-pipelines.yml
 
-# IDE
-.idea/
-.vscode/
-*.iml
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Docker
-.dockerignore
-Dockerfile*
-docker-compose*.yml
-
-# Examples
-examples/
-
-# Build artifacts
-build/
-dist/
-target/
-*.log
-
-# Local environment
+# Development files
+.editorconfig
 .env.local
 .env.*.local
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Python files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+.hypothesis/
+.tox/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# Distribution / packaging
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Test files
+test/
+tests/
+*_test.py
+test_*.py
+
+# Docker files
+docker-compose*.yml
+Dockerfile*
+.dockerignore
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Node.js (if any frontend)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Example/sample files
+examples/
+samples/
