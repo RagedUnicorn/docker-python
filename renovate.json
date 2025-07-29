@@ -1,0 +1,66 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:base"
+  ],
+  "schedule": [
+    "every monday"
+  ],
+  "timezone": "UTC",
+  "labels": ["dependencies", "renovate"],
+  "packageRules": [
+    {
+      "description": "Automatically merge minor and patch updates for Python base image",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["python"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true
+    },
+    {
+      "description": "Automatically merge all Alpine Linux updates",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["alpine"],
+      "automerge": true
+    },
+    {
+      "description": "Group Python package updates",
+      "matchManagers": ["dockerfile"],
+      "matchPackagePatterns": ["^pip install"],
+      "groupName": "Python packages"
+    }
+  ],
+  "docker": {
+    "enabled": true,
+    "pinDigests": false
+  },
+  "regexManagers": [
+    {
+      "description": "Update Python version in Dockerfile",
+      "fileMatch": ["^Dockerfile$"],
+      "matchStrings": [
+        "FROM python:(?<currentValue>.*?)-alpine(?<currentAlpineValue>.*?)\\s"
+      ],
+      "datasourceTemplate": "docker",
+      "depNameTemplate": "python",
+      "versioningTemplate": "docker"
+    },
+    {
+      "description": "Update Alpine version in Dockerfile",
+      "fileMatch": ["^Dockerfile$"],
+      "matchStrings": [
+        "FROM alpine:(?<currentValue>.*?)\\s"
+      ],
+      "datasourceTemplate": "docker",
+      "depNameTemplate": "alpine",
+      "versioningTemplate": "docker"
+    }
+  ],
+  "commitMessagePrefix": "chore(deps):",
+  "commitMessageAction": "update",
+  "commitMessageTopic": "{{depName}}",
+  "commitMessageExtra": "to {{newVersion}}",
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 2,
+  "rebaseWhen": "behind-base-branch",
+  "assignees": ["ragedunicorn"]
+}
