@@ -17,7 +17,7 @@ This Docker image provides a minimal Python installation built on Alpine Linux. 
 ## Features
 
 - **Small footprint**: ~50MB runtime image using Alpine Linux
-- **Python 3**: Latest Python 3 version from Alpine packages
+- **Python 3.12.11**: Provided by Alpine 3.22.1 packages
 - **Minimal installation**: Only Python and pip included
 - **Non-root user**: Enhanced security with dedicated python user
 - **Volume mounting**: Easy code and data access through `/app`
@@ -44,11 +44,14 @@ The container uses Python as the entrypoint, so any Python parameters can be pas
 # Using latest version
 docker run -v $(pwd):/app ragedunicorn/python:latest [python-options]
 
-# Using specific Python version (latest Alpine build)
+# Using specific Python major version
 docker run -v $(pwd):/app ragedunicorn/python:3 [python-options]
 
-# Using exact version combination
-docker run -v $(pwd):/app ragedunicorn/python:3-alpine3.22.1-1 [python-options]
+# Using specific Python version tag
+docker run -v $(pwd):/app ragedunicorn/python:v3.12.11 [python-options]
+
+# Using exact version combination (Python 3.12.11 on Alpine 3.22.1)
+docker run -v $(pwd):/app ragedunicorn/python:v3-alpine3.22.1-1 [python-options]
 ```
 
 ### Examples
@@ -160,10 +163,14 @@ CMD ["python", "app.py"]
 
 This project uses semantic versioning that matches the Docker image contents:
 
-**Format:** `{python_major_version}-alpine{alpine_version}-{build_number}`
+**Primary Format:** `v{python_major_version}-alpine{alpine_version}-{build_number}`
+
+**Python Version Format:** `v{python_full_version}` (e.g., `v3.12.11`)
 
 Examples:
-- `3-alpine3.22.1-1` - Python 3 on Alpine 3.22.1, build 1
+- `v3-alpine3.22.1-1` - Python 3.12.11 on Alpine 3.22.1, build 1
+- `v3.12.11` - Specific Python version tag
+- `v3.12.0` - Python minor version tag
 - `latest` - Most recent stable release
 
 For detailed release process and versioning guidelines, see [RELEASE.md](RELEASE.md).
