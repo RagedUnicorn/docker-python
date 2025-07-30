@@ -13,18 +13,27 @@
 #   - Exposes common development ports
 
 services:
-  python:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        BUILD_DATE: ${BUILD_DATE:-dev}
-        VERSION: ${VERSION:-dev}
+  python-dev:
+    build: .
+    image: ragedunicorn/python:dev
     volumes:
       - .:/app
+    working_dir: /app
     stdin_open: true
     tty: true
+    # Override entrypoint to get a shell
+    entrypoint: /bin/sh
+    labels:
+      org.opencontainers.image.title: "Python on Alpine Linux (Dev)"
+      org.opencontainers.image.description: "Python development environment for testing and debugging"
+      org.opencontainers.image.vendor: "ragedunicorn"
     environment:
       - PYTHONUNBUFFERED=1
       - PYTHONDONTWRITEBYTECODE=1
       - TERM=xterm-256color
+    # Resource limits for development (optional)
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '4'
+    #       memory: 4G
