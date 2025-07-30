@@ -14,7 +14,6 @@ LABEL org.opencontainers.image.title="Python on Alpine Linux" \
       org.opencontainers.image.created="${BUILD_DATE}" \
       org.opencontainers.image.base.name="docker.io/library/alpine:3.22.1"
 
-# Install Python 3.12.11 (provided by Alpine 3.22.1)
 RUN apk add --no-cache \
     python3 \
     py3-pip
