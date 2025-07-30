@@ -1,42 +1,66 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:base"
+    "config:recommended"
   ],
   "schedule": [
-    "every monday"
+    "on monday"
   ],
   "timezone": "UTC",
-  "labels": ["dependencies", "renovate"],
+  "labels": [
+    "dependencies",
+    "renovate"
+  ],
   "packageRules": [
     {
+      "matchCategories": [
+        "docker"
+      ],
+      "enabled": true,
+      "pinDigests": false
+    },
+    {
       "description": "Automatically merge minor and patch updates for Python base image",
-      "matchDatasources": ["docker"],
-      "matchPackageNames": ["python"],
-      "matchUpdateTypes": ["minor", "patch"],
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchPackageNames": [
+        "python"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
       "automerge": true
     },
     {
       "description": "Automatically merge all Alpine Linux updates",
-      "matchDatasources": ["docker"],
-      "matchPackageNames": ["alpine"],
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchPackageNames": [
+        "alpine"
+      ],
       "automerge": true
     },
     {
       "description": "Group Python package updates",
-      "matchManagers": ["dockerfile"],
-      "matchPackagePatterns": ["^pip install"],
-      "groupName": "Python packages"
+      "matchManagers": [
+        "dockerfile"
+      ],
+      "groupName": "Python packages",
+      "matchPackageNames": [
+        "/^pip install/"
+      ]
     }
   ],
-  "docker": {
-    "enabled": true,
-    "pinDigests": false
-  },
-  "regexManagers": [
+  "customManagers": [
     {
+      "customType": "regex",
       "description": "Update Python version in Dockerfile",
-      "fileMatch": ["^Dockerfile$"],
+      "managerFilePatterns": [
+        "/^Dockerfile$/"
+      ],
       "matchStrings": [
         "FROM python:(?<currentValue>.*?)-alpine(?<currentAlpineValue>.*?)\\s"
       ],
@@ -45,8 +69,11 @@
       "versioningTemplate": "docker"
     },
     {
+      "customType": "regex",
       "description": "Update Alpine version in Dockerfile",
-      "fileMatch": ["^Dockerfile$"],
+      "managerFilePatterns": [
+        "/^Dockerfile$/"
+      ],
       "matchStrings": [
         "FROM alpine:(?<currentValue>.*?)\\s"
       ],
@@ -62,5 +89,7 @@
   "prConcurrentLimit": 5,
   "prHourlyLimit": 2,
   "rebaseWhen": "behind-base-branch",
-  "assignees": ["ragedunicorn"]
+  "assignees": [
+    "ragedunicorn"
+  ]
 }
