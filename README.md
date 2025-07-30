@@ -12,12 +12,12 @@
 
 ## Overview
 
-This Docker image provides a minimal Python installation built on Alpine Linux. It includes only Python and pip, allowing you to install exactly what you need for your specific use case.
+This Docker image provides a minimal Python installation built on Alpine Linux. It uses Alpine's Python packages but removes the PEP 668 restriction, allowing you to install packages with pip without additional flags or virtual environments.
 
 ## Features
 
 - **Small footprint**: ~50MB runtime image using Alpine Linux
-- **Python 3**: Latest Python 3 version from Alpine packages
+- **Python 3.12.11**: Alpine packages with PEP 668 restriction removed
 - **Minimal installation**: Only Python and pip included
 - **Non-root user**: Enhanced security with dedicated python user
 - **Volume mounting**: Easy code and data access through `/app`

@@ -14,16 +14,16 @@ LABEL org.opencontainers.image.title="Python on Alpine Linux" \
       org.opencontainers.image.created="${BUILD_DATE}" \
       org.opencontainers.image.base.name="docker.io/library/alpine:3.22.1"
 
-RUN apk add --no-cache \
-    python3 \
-    py3-pip
+# Install Python from Alpine packages and remove PEP 668 restriction
+RUN apk add --no-cache python3 py3-pip && \
+    rm -f /usr/lib/python*/EXTERNALLY-MANAGED
 
 RUN ln -sf python3 /usr/bin/python
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1
 
-RUN adduser -D -H -s /sbin/nologin python
+RUN adduser -D -s /sbin/nologin python
 
 WORKDIR /app
 

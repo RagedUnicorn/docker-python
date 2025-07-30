@@ -11,7 +11,7 @@ docker run -it --rm ragedunicorn/python:latest
 
 ## Features
 
-- 🐍 **Python 3.12.11** - Provided by Alpine 3.22.1 packages
+- 🐍 **Python 3.12.11** - Alpine packages with PEP 668 restriction removed
 - 🏔️ **Alpine Linux** - Ultra-minimal base image (~50MB)
 - 📦 **Minimal installation** - Only Python and pip included
 - 🔒 **Security** - Non-root user, minimal attack surface
@@ -49,8 +49,8 @@ docker run -v $(pwd):/app ragedunicorn/python:latest /bin/sh -c "pip install bla
 ## Base Installation
 
 This image includes only:
-- Python 3.12.11 (from Alpine 3.22.1 packages)
-- pip (Python package installer)
+- Python 3.12.11 (from Alpine packages)
+- pip (Python package installer) with PEP 668 restriction removed
 
 No additional packages are pre-installed, keeping the image minimal and allowing you to install only what you need.
 
