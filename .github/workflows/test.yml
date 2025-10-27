@@ -117,7 +117,7 @@ jobs:
           fi
       - name: Upload test logs
         if: always() && (steps.file-tests.outcome == 'failure' || steps.command-tests.outcome == 'failure' || steps.metadata-tests.outcome == 'failure' || steps.basic-tests.outcome == 'failure')
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: test-logs
           path: |
