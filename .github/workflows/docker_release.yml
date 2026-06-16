@@ -10,7 +10,41 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+      - name: Build test image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          # Single-platform, daemon-loaded, no attestation manifest so the
+          # Container Structure Tests can inspect the image (an OCI index would
+          # fail with "no such image"). See TEST.md troubleshooting.
+          load: true
+          provenance: false
+          platforms: linux/amd64
+          tags: ragedunicorn/python:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Run Container Structure Tests
+        env:
+          PYTHON_VERSION: test
+        run: |
+          echo "::notice title=🧪 Running Tests::Validating Docker image before release..."
+          docker pull ragedunicorn/container-test:latest
+
+          echo "::group::Running all Container Structure Tests"
+          docker compose -f docker-compose.test.yml run --rm test-all
+          echo "::endgroup::"
+
+          echo "::notice title=✅ Tests Passed::All Container Structure Tests completed successfully!"
+
   build-and-push:
+    needs: test
     runs-on: ubuntu-latest
     permissions:
       contents: read
