@@ -19,7 +19,14 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           context: .
+          # Container Structure Tests inspect the image via the Docker daemon,
+          # which can only read a single-platform image. load:true loads one
+          # platform into the daemon; provenance:false keeps BuildKit from
+          # wrapping it in an attestation manifest (an OCI index), which would
+          # make the tests fail with "no such image".
           load: true
+          provenance: false
+          platforms: linux/amd64
           tags: ragedunicorn/python:test
           cache-from: type=gha
           cache-to: type=gha,mode=max
