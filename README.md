@@ -12,12 +12,12 @@
 
 ## Overview
 
-This Docker image provides a minimal Python installation built on Alpine Linux. It uses Alpine's Python packages but removes the PEP 668 restriction, allowing you to install packages with pip without additional flags or virtual environments.
+This Docker image provides a minimal Python installation built on Alpine Linux. It ships a pinned, standalone CPython build ([python-build-standalone](https://github.com/astral-sh/python-build-standalone)) rather than Alpine's `python3` package, so the Python version is fixed independently of the Alpine release.
 
 ## Features
 
-- **Small footprint**: ~50MB runtime image using Alpine Linux
-- **Python 3.12.11**: Alpine packages with PEP 668 restriction removed
+- **Small footprint**: compact runtime image using Alpine Linux
+- **Python 3.14.6**: pinned standalone CPython
 - **Minimal installation**: Only Python and pip included
 - **Non-root user**: Enhanced security with dedicated python user
 - **Volume mounting**: Easy code and data access through `/app`
@@ -48,7 +48,7 @@ docker run -v $(pwd):/app ragedunicorn/python:latest [python-options]
 docker run -v $(pwd):/app ragedunicorn/python:3 [python-options]
 
 # Using exact version combination
-docker run -v $(pwd):/app ragedunicorn/python:3-alpine3.22.1-1 [python-options]
+docker run -v $(pwd):/app ragedunicorn/python:3-alpine3.24.0-1 [python-options]
 ```
 
 ### Examples
@@ -163,7 +163,7 @@ This project uses semantic versioning that matches the Docker image contents:
 **Format:** `{python_major_version}-alpine{alpine_version}-{build_number}`
 
 Examples:
-- `3-alpine3.22.1-1` - Python 3 on Alpine 3.22.1, build 1
+- `3-alpine3.24.0-1` - Python 3 on Alpine 3.24.0, build 1
 - `latest` - Most recent stable release
 
 For detailed release process and versioning guidelines, see [RELEASE.md](RELEASE.md).
@@ -172,8 +172,9 @@ For detailed release process and versioning guidelines, see [RELEASE.md](RELEASE
 
 This project uses [Renovate](https://docs.renovatebot.com/) to automatically check for updates to:
 - Alpine Linux base image version (all major, minor, and patch updates)
+- The pinned CPython version and the python-build-standalone release it is fetched from
 
-Renovate runs weekly (every Monday) and creates pull requests when updates are available. The configuration tracks Alpine Linux releases, creating pull requests for each update.
+Renovate runs weekly (every Monday) and creates pull requests when updates are available. Every Alpine reference is kept in sync from a single update: the `FROM` line, the `org.opencontainers.image.base.name` OCI label, and the Alpine version asserted in `test/python_metadata_test.yml` are grouped into one pull request. The CPython version and its python-build-standalone release are likewise grouped together.
 
 ## Documentation
 

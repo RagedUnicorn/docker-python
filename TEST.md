@@ -174,43 +174,45 @@ When testing different versions, always build locally first:
 
 ```bash
 # Build a specific version locally
-docker build -t ragedunicorn/python:3-alpine3.22.1-1 .
+docker build -t ragedunicorn/python:3-alpine3.24.0-1 .
 ```
 
 **Linux/macOS:**
 
 ```bash
 # Test that specific version
-PYTHON_VERSION=3-alpine3.22.1-1 docker compose -f docker-compose.test.yml run test-all
+PYTHON_VERSION=3-alpine3.24.0-1 docker compose -f docker-compose.test.yml run test-all
 ```
 
 **Windows (PowerShell):**
 
 ```powershell
 # Test that specific version
-$env:PYTHON_VERSION="3-alpine3.22.1-1"; docker compose -f docker-compose.test.yml run test-all
+$env:PYTHON_VERSION="3-alpine3.24.0-1"; docker compose -f docker-compose.test.yml run test-all
 ```
 
 ## Troubleshooting Test Failures
 
-### Library Version Mismatches
+### Python Version / Path Mismatches
 
-Alpine Linux uses versioned shared libraries and symlinks for Python binaries. When Alpine or Python packages are updated, the test file `test/python_test.yml` may need to be updated with the new paths or permissions.
+The interpreter is a pinned standalone CPython under `/opt/python`. When the pinned `PYTHON_VERSION` changes minor (e.g. 3.14 → 3.15), the version-specific paths in `test/python_test.yml` (`/opt/python/lib/python3.X`) and the expected output in `test/python_command_test.yml` (`Python 3.X`) must be updated to match.
 
 To find the current Python installation details in the image:
 
 ```bash
 docker run --rm --entrypoint sh ragedunicorn/python:latest -c \
-  "ls -la /usr/bin/python* && ls -la /usr/lib/python*"
+  "ls -la /opt/python/bin/python* && ls -la /opt/python/lib"
 ```
 
-### Permission Test Failures
+### Binary Layout
 
-Alpine Linux Python binaries are typically symlinks, which show as `Lrwxrwxrwx` (note the capital L). Ensure permission strings in tests match exactly:
+`/opt/python/bin` contains `python3`, the `python` entrypoint, and `pip`/`pip3`. The file
+existence tests assert these paths exist rather than asserting exact permission modes (symlink
+vs. regular file varies between standalone CPython releases):
 
 ```bash
-# Check actual permissions
-docker run --rm --entrypoint sh ragedunicorn/python:test -c "ls -la /usr/bin/python*"
+# Inspect the interpreter binaries
+docker run --rm --entrypoint sh ragedunicorn/python:test -c "ls -la /opt/python/bin/python*"
 ```
 
 ### Metadata Test Failures
@@ -311,8 +313,8 @@ The `test-all` service returns:
 
 When updating the Docker image:
 
-1. **Python version updates**: Usually no test changes needed (uses version patterns)
-2. **Alpine version updates**: May require permission or path updates in tests
+1. **Python version updates**: A minor bump (3.X → 3.Y) requires updating the `/opt/python/lib/python3.X` paths in `python_test.yml` and the `Python 3.X` output in `python_command_test.yml`; patch bumps need no test changes
+2. **Alpine version updates**: Renovate keeps the `base.name` label and `python_metadata_test.yml` in sync with the `FROM` version, so no manual edit is needed for the drift to resolve
 3. **New functionality**: Add corresponding tests to verify behavior
 4. **Label changes**: Update metadata tests to match new labels
 

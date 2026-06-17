@@ -6,8 +6,8 @@ This document describes how to create a new release for the Docker Python projec
 
 ```bash
 # Tag format: v{python_major_version}-alpine{alpine_version}-{build_number}
-git tag -a v3-alpine3.22.1-1 -m "v3-alpine3.22.1-1"
-git push origin v3-alpine3.22.1-1
+git tag -a v3-alpine3.24.0-1 -m "v3-alpine3.24.0-1"
+git push origin v3-alpine3.24.0-1
 ```
 
 This automatically triggers the release process via GitHub Actions.
@@ -19,10 +19,10 @@ See [README.md](README.md#versioning) for the complete versioning documentation.
 **Format:** `v{python_major_version}-alpine{alpine_version}-{build_number}`
 
 Examples:
-- `v3-alpine3.22.1-1` - Initial release
-- `v3-alpine3.22.1-2` - Rebuild with same versions
-- `v3-alpine3.22.2-1` - Alpine update (build resets to 1)
-- `v3-alpine3.23.0-1` - Major Alpine update (build resets to 1)
+- `v3-alpine3.24.0-1` - Initial release
+- `v3-alpine3.24.0-2` - Rebuild with same versions
+- `v3-alpine3.24.1-1` - Alpine update (build resets to 1)
+- `v3-alpine3.25.0-1` - Major Alpine update (build resets to 1)
 
 ## Release Workflow
 
@@ -98,7 +98,7 @@ Before creating a release:
 
 ### Release didn't trigger
 
-- Ensure tag starts with `v` and follows the format (e.g., `v3-alpine3.22.1-1`)
+- Ensure tag starts with `v` and follows the format (e.g., `v3-alpine3.24.0-1`)
 - Check GitHub Actions tab for workflow runs
 - Verify you have push permissions
 
@@ -137,10 +137,10 @@ If automation fails, you can create a release manually:
 
 1. Go to repository's "Releases" page
 2. Click "Create a new release"
-3. Choose your tag (must follow format: `v3-alpine3.22.1-1`)
+3. Choose your tag (must follow format: `v3-alpine3.24.0-1`)
 4. Add release notes
 5. Include Docker pull commands:
    ```
-   docker pull ghcr.io/ragedunicorn/docker-python:3-alpine3.22.1-1
-   docker pull ragedunicorn/python:3-alpine3.22.1-1
+   docker pull ghcr.io/ragedunicorn/docker-python:3-alpine3.24.0-1
+   docker pull ragedunicorn/python:3-alpine3.24.0-1
    ```

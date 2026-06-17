@@ -62,8 +62,8 @@ docker build -t ragedunicorn/python:dev .
 # Build with specific versions
 docker build \
   --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
-  --build-arg VERSION=3-alpine3.22.1-1 \
-  -t ragedunicorn/python:3-alpine3.22.1-1 .
+  --build-arg VERSION=3-alpine3.24.0-1 \
+  -t ragedunicorn/python:3-alpine3.24.0-1 .
 
 # Multi-platform build (requires buildx)
 docker buildx build \
@@ -122,7 +122,8 @@ See [TEST.md](TEST.md) for detailed testing information.
 
 This project uses [Renovate](https://docs.renovatebot.com/) to automatically manage dependency updates:
 
-- **Alpine Linux**: Renovate monitors Docker Hub and creates PRs for new Alpine versions
+- **Alpine Linux**: Renovate monitors Docker Hub and creates PRs for new Alpine versions. Every Alpine reference is kept in sync from a single grouped PR — the `FROM` line (Renovate's built-in dockerfile manager), the `org.opencontainers.image.base.name` OCI label, and the Alpine version asserted in `test/python_metadata_test.yml` (both via regex `customManagers` in `renovate.json`).
+- **Python**: The CPython version is pinned via the `PYTHON_VERSION` build arg, fetched from a pinned [python-build-standalone](https://github.com/astral-sh/python-build-standalone) release (`PYTHON_BUILD_STANDALONE_RELEASE`). Both are tracked through the `# renovate:` comments above their `ARG` lines and grouped into one PR.
 
 When Renovate creates a PR:
 
@@ -131,31 +132,34 @@ When Renovate creates a PR:
 3. Test the build locally if it's a major version update
 4. Merge the PR if everything looks good
 
-Manual version updates are rarely needed, but if required:
+Manual version updates are rarely needed. Because the Python version is pinned independently of Alpine, an Alpine bump no longer changes the Python version. If you must update manually:
 
 ```dockerfile
-# Alpine base image
-FROM alpine:3.22.1
+# Pinned CPython version (fetched from python-build-standalone)
+# renovate: datasource=docker depName=python versioning=docker
+ARG PYTHON_VERSION=3.14.6
 ```
 
-When manually updating versions:
+When manually updating the Python version:
 
-1. Update the `FROM alpine:X.X.X` line in the Dockerfile
-2. Test the build thoroughly - Python package versions may have changed
-3. Update library versions in `test/python_test.yml` if needed
+1. Update `PYTHON_VERSION` (and, if the new patch lives in a newer python-build-standalone release, `PYTHON_BUILD_STANDALONE_RELEASE`) in the Dockerfile
+2. Test the build thoroughly
+3. Update the Python minor in `test/python_test.yml` (`/opt/python/lib/python3.X` paths) and `test/python_command_test.yml`
 4. Update version numbers in documentation
+
+When manually updating the Alpine version, update only the `FROM alpine:X.X.X` line — Renovate keeps the `base.name` label and metadata test aligned on its next run.
 
 ### Adding Python Packages
 
-To add packages to the base image (discouraged - users should extend the image):
+To add Python packages to the base image (discouraged - users should extend the image):
 
 ```dockerfile
-# Add after the pip installation
-RUN apk add --no-cache \
-    python3 \
-    py3-pip \
-    your-new-package  # Add here
+# Add after the interpreter is in place; pip works without --break-system-packages
+RUN pip install --no-cache-dir your-new-package
 ```
+
+System packages can still be added with `apk` (the base is Alpine), but Python itself
+comes from the bundled standalone CPython under `/opt/python`, not from `apk`.
 
 **Note:** This image is intentionally minimal. Users should extend it:
 
@@ -198,8 +202,8 @@ RUN pip install requests numpy pandas
 # Verbose build output
 docker build --progress=plain --no-cache -t ragedunicorn/python:debug .
 
-# Check Alpine package availability
-docker run --rm alpine:3.22.1 apk search python3
+# Inspect the bundled standalone interpreter
+docker run --rm --entrypoint sh ragedunicorn/python:debug -c "ls /opt/python/bin && /opt/python/bin/python3 --version"
 ```
 
 **Python not working:**
@@ -216,8 +220,8 @@ docker run --rm --entrypoint sh ragedunicorn/python:dev -c "pip --version"
 **Package installation issues:**
 
 ```bash
-# Check available packages
-docker run --rm --entrypoint sh ragedunicorn/python:dev -c "apk search py3-"
+# List installed Python packages
+docker run --rm --entrypoint sh ragedunicorn/python:dev -c "pip list"
 
 # Test package installation
 docker run --rm --entrypoint sh ragedunicorn/python:dev -c "pip install requests"

@@ -20,12 +20,12 @@
       "pinDigests": false
     },
     {
-      "description": "Automatically merge minor and patch updates for Python base image",
+      "description": "Automatically merge minor and patch updates for Alpine",
       "matchDatasources": [
         "docker"
       ],
       "matchPackageNames": [
-        "python"
+        "alpine"
       ],
       "matchUpdateTypes": [
         "minor",
@@ -34,52 +34,60 @@
       "automerge": true
     },
     {
-      "description": "Automatically merge all Alpine Linux updates",
-      "matchDatasources": [
-        "docker"
-      ],
+      "description": "Group every Alpine reference (FROM, base.name label, metadata test) into one PR",
       "matchPackageNames": [
         "alpine"
       ],
-      "automerge": true
+      "groupName": "alpine",
+      "groupSlug": "alpine"
     },
     {
-      "description": "Group Python package updates",
-      "matchManagers": [
-        "dockerfile"
-      ],
-      "groupName": "Python packages",
+      "description": "Group the pinned CPython version and python-build-standalone release into one PR",
       "matchPackageNames": [
-        "/^pip install/"
-      ]
+        "python",
+        "astral-sh/python-build-standalone"
+      ],
+      "groupName": "python",
+      "groupSlug": "python"
     }
   ],
   "customManagers": [
     {
       "customType": "regex",
-      "description": "Update Python version in Dockerfile",
+      "description": "Update versions pinned via renovate comments before ARG lines in the Dockerfile",
       "managerFilePatterns": [
         "/^Dockerfile$/"
       ],
       "matchStrings": [
-        "FROM python:(?<currentValue>.*?)-alpine(?<currentAlpineValue>.*?)\\s"
+        "# renovate: datasource=(?<datasource>.*?) depName=(?<depName>.*?)(?: versioning=(?<versioning>.*?))?\\s+ARG .*?=(?<currentValue>.*)"
       ],
-      "datasourceTemplate": "docker",
-      "depNameTemplate": "python",
-      "versioningTemplate": "docker"
+      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}"
     },
     {
       "customType": "regex",
-      "description": "Update Alpine version in Dockerfile",
+      "description": "Keep the Alpine base.name OCI label in the Dockerfile in sync with the FROM version",
       "managerFilePatterns": [
         "/^Dockerfile$/"
       ],
+      "datasourceTemplate": "docker",
+      "depNameTemplate": "alpine",
+      "versioningTemplate": "docker",
       "matchStrings": [
-        "FROM alpine:(?<currentValue>.*?)\\s"
+        "image\\.base\\.name=\"docker\\.io/library/alpine:(?<currentValue>[^\"]+)\""
+      ]
+    },
+    {
+      "customType": "regex",
+      "description": "Keep the Alpine version in the metadata test in sync with the FROM version",
+      "managerFilePatterns": [
+        "/^test/python_metadata_test\\.yml$/"
       ],
       "datasourceTemplate": "docker",
       "depNameTemplate": "alpine",
-      "versioningTemplate": "docker"
+      "versioningTemplate": "docker",
+      "matchStrings": [
+        "docker\\.io/library/alpine:(?<currentValue>[^']+)'"
+      ]
     }
   ],
   "commitMessagePrefix": "chore(deps):",
