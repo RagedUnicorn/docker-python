@@ -1,29 +1,33 @@
-# Python Docker Image
+# Python Alpine Docker Image
 
-Minimal Python Docker image built on Alpine Linux.
+![Docker Python](https://raw.githubusercontent.com/ragedunicorn/docker-python/master/docs/docker_python.png)
+
+A minimal Python image on Alpine Linux, shipping a pinned standalone CPython decoupled from the Alpine release.
 
 ## Quick Start
 
 ```bash
+# Pull latest version
 docker pull ragedunicorn/python:latest
+
+# Or pull specific version
+docker pull ragedunicorn/python:3-alpine3.24.0-1
+
+# Run Python interactively
 docker run -it --rm ragedunicorn/python:latest
+
+# Run a Python script
+docker run -v $(pwd):/app ragedunicorn/python:latest script.py
 ```
 
 ## Features
 
-- 🐍 **Python 3.14.6** - pinned standalone CPython
-- 🏔️ **Alpine Linux** - Minimal base image
-- 📦 **Minimal installation** - Only Python and pip included
-- 🔒 **Security** - Non-root user, minimal attack surface
-- 🚀 **Multi-architecture** - Supports amd64 and arm64
-- 🎯 **Customizable** - Install only what you need
-
-## Available Tags
-
-- `latest` - Most recent stable release
-- `v3-alpine3.24.0-1` - Python 3.14.6 on Alpine 3.24.0, build 1
-- `v3.14.6` - Specific Python version tag
-- `v3.14` - Python minor version tag
+- 🚀 **Small footprint**: compact runtime image built on Alpine Linux
+- 🐍 **Python**: pinned standalone CPython, decoupled from Alpine
+- 📦 **Minimal installation**: only Python and pip included
+- 🔒 **Security**: non-root user, minimal attack surface
+- 🏗️ **Multi-platform**: supports linux/amd64 and linux/arm64
+- 🎯 **Customizable**: install only what you need
 
 ## Usage Examples
 
@@ -34,7 +38,12 @@ docker run -v $(pwd):/app ragedunicorn/python:latest script.py
 
 ### Interactive Python shell
 ```bash
-docker run -it ragedunicorn/python:latest
+docker run -it --rm ragedunicorn/python:latest
+```
+
+### Execute Python code
+```bash
+docker run --rm ragedunicorn/python:latest -c "print('Hello, World!')"
 ```
 
 ### Install packages and run commands
@@ -46,30 +55,7 @@ docker run -v $(pwd):/app ragedunicorn/python:latest /bin/sh -c "pip install pyt
 docker run -v $(pwd):/app ragedunicorn/python:latest /bin/sh -c "pip install black && python -m black ."
 ```
 
-## Base Installation
-
-This image includes only:
-- Python 3.14.6 (pinned standalone CPython from python-build-standalone)
-- pip (Python package installer)
-
-No additional packages are pre-installed, keeping the image minimal and allowing you to install only what you need.
-
-## Environment Variables
-
-- `PYTHONUNBUFFERED=1` - Unbuffered output
-
-## Working Directory
-
-The default working directory is `/app`. Mount your code here:
-
-```bash
-docker run -v $(pwd):/app ragedunicorn/python:latest your_script.py
-```
-
-## Building Custom Images
-
-Create your own image with additional packages:
-
+### Build a custom image
 ```dockerfile
 FROM ragedunicorn/python:latest
 
@@ -84,12 +70,39 @@ COPY . .
 CMD ["python", "app.py"]
 ```
 
+## Tags
+
+This image uses semantic versioning that includes all component versions:
+
+**Format:** `{python_major_version}-alpine{alpine_version}-{build_number}`
+
+### Version Examples
+
+- `3-alpine3.24.0-1` - Initial release with Python 3 and Alpine 3.24.0
+- `3-alpine3.24.0-2` - Rebuild of same versions (bug fixes, security patches)
+- `3-alpine3.24.1-1` - Alpine Linux patch update
+- `latest` - Most recent stable release
+
+The pinned CPython patch version is fixed per release and updated independently of Alpine. When updates are available through automated dependency management, new releases are created with appropriate version tags.
+
+## Environment Variables
+
+- `PYTHONUNBUFFERED=1` - Unbuffered output
+
+## Working Directory
+
+The default working directory is `/app`. Mount your code here:
+
+```bash
+docker run -v $(pwd):/app ragedunicorn/python:latest your_script.py
+```
+
 ## Links
 
-- [GitHub Repository](https://github.com/ragedunicorn/docker-python)
-- [Documentation](https://github.com/ragedunicorn/docker-python/blob/master/README.md)
-- [Issues](https://github.com/ragedunicorn/docker-python/issues)
+- **GitHub**: [https://github.com/ragedunicorn/docker-python](https://github.com/ragedunicorn/docker-python)
+- **Issues**: [https://github.com/ragedunicorn/docker-python/issues](https://github.com/ragedunicorn/docker-python/issues)
+- **Releases**: [https://github.com/ragedunicorn/docker-python/releases](https://github.com/ragedunicorn/docker-python/releases)
 
 ## License
 
-MIT License - see [LICENSE](https://github.com/ragedunicorn/docker-python/blob/master/LICENSE.txt)
+MIT License - See [GitHub repository](https://github.com/ragedunicorn/docker-python) for details.
