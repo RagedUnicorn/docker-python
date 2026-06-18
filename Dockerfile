@@ -1,7 +1,7 @@
 ############################################
 # Download + verify stage
 ############################################
-FROM alpine:3.24.0 AS build
+FROM alpine:3.24.1 AS build
 
 # renovate: datasource=docker depName=python versioning=docker
 ARG PYTHON_VERSION=3.14.6
@@ -40,7 +40,7 @@ RUN set -eux; \
 ############################################
 # Runtime stage
 ############################################
-FROM alpine:3.24.0
+FROM alpine:3.24.1
 
 ARG BUILD_DATE
 ARG VERSION
@@ -54,7 +54,7 @@ LABEL org.opencontainers.image.title="Python on Alpine Linux" \
       org.opencontainers.image.licenses="MIT" \
       org.opencontainers.image.version="${VERSION}" \
       org.opencontainers.image.created="${BUILD_DATE}" \
-      org.opencontainers.image.base.name="docker.io/library/alpine:3.24.0"
+      org.opencontainers.image.base.name="docker.io/library/alpine:3.24.1"
 
 # ca-certificates: TLS trust store for pip / urllib HTTPS requests
 RUN apk add --no-cache ca-certificates
