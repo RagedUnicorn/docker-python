@@ -1,5 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "ignorePaths intentionally overrides the :ignoreModulesAndTests preset from config:recommended: test/ must stay visible so the metadata-test custom manager can update test/python_metadata_test.yml",
   "extends": [
     "config:recommended"
   ],
@@ -10,6 +11,12 @@
   "labels": [
     "dependencies",
     "renovate"
+  ],
+  "ignorePaths": [
+    "docker-compose.yml",
+    "docker-compose.dev.yml",
+    "docker-compose.test.yml",
+    "examples/**"
   ],
   "packageRules": [
     {
