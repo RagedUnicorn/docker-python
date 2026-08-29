@@ -1,6 +1,6 @@
 # Python Alpine Docker Image
 
-![Docker Python](https://raw.githubusercontent.com/ragedunicorn/docker-python/master/docs/docker_python.png)
+![Docker Python](https://raw.githubusercontent.com/ragedunicorn/docker-python/master/docs/docker_python_banner.png)
 
 A minimal Python image on Alpine Linux, shipping a pinned standalone CPython decoupled from the Alpine release.
 
