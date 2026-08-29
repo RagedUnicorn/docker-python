@@ -1,6 +1,6 @@
 # docker-python
 
-![](./docs/docker_python.png)
+![](./docs/docker_python_banner.svg)
 
 [![Release Build](https://github.com/ragedunicorn/docker-python/actions/workflows/docker_release.yml/badge.svg)](https://github.com/ragedunicorn/docker-python/actions/workflows/docker_release.yml)
 [![Test](https://github.com/ragedunicorn/docker-python/actions/workflows/test.yml/badge.svg)](https://github.com/ragedunicorn/docker-python/actions/workflows/test.yml)
