@@ -4,9 +4,9 @@
 FROM alpine:3.24.2 AS build
 
 # renovate: datasource=docker depName=python versioning=docker
-ARG PYTHON_VERSION=3.14.6
+ARG PYTHON_VERSION=3.14.7
 # renovate: datasource=github-releases depName=astral-sh/python-build-standalone versioning=regex:^(?<major>\d{4})(?<minor>\d{2})(?<patch>\d{2})$
-ARG PYTHON_BUILD_STANDALONE_RELEASE=20260718
+ARG PYTHON_BUILD_STANDALONE_RELEASE=20260924
 # Provided automatically by buildx (linux/amd64 -> amd64, linux/arm64 -> arm64)
 ARG TARGETARCH
 
