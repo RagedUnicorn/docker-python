@@ -20,11 +20,11 @@ fileExistenceTests:
 
   # Core Python libraries (standalone CPython under /opt/python)
   - name: 'Python standard library exists'
-    path: '/opt/python/lib/python3.14'
+    path: '/opt/python/lib/python3.15'
     shouldExist: true
 
   - name: 'Python site-packages exists'
-    path: '/opt/python/lib/python3.14/site-packages'
+    path: '/opt/python/lib/python3.15/site-packages'
     shouldExist: true
 
   - name: 'SSL certificates for pip'
