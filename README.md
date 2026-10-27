@@ -17,7 +17,7 @@ This Docker image provides a minimal Python installation built on Alpine Linux. 
 ## Features
 
 - **Small footprint**: compact runtime image using Alpine Linux
-- **Python 3.14.6**: pinned standalone CPython
+- **Python 3.15.2**: pinned standalone CPython
 - **Minimal installation**: Only Python and pip included
 - **Non-root user**: Enhanced security with dedicated python user
 - **Volume mounting**: Easy code and data access through `/app`
