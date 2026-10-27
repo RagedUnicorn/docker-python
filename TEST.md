@@ -195,7 +195,7 @@ $env:PYTHON_VERSION="3-alpine3.24.0-1"; docker compose -f docker-compose.test.ym
 
 ### Python Version / Path Mismatches
 
-The interpreter is a pinned standalone CPython under `/opt/python`. When the pinned `PYTHON_VERSION` changes minor (e.g. 3.14 → 3.15), the version-specific paths in `test/python_test.yml` (`/opt/python/lib/python3.X`) and the expected output in `test/python_command_test.yml` (`Python 3.X`) must be updated to match.
+The interpreter is a pinned standalone CPython under `/opt/python`. When the pinned `PYTHON_VERSION` changes minor (e.g. 3.14 → 3.15), the version-specific paths in `test/python_test.yml` (`/opt/python/lib/python3.X`) and the expected output in `test/python_command_test.yml` (`Python 3.X`) must match. Renovate updates them in the same grouped `python` PR; only manual bumps need to touch them by hand.
 
 To find the current Python installation details in the image:
 

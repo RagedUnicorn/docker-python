@@ -95,6 +95,32 @@
       "matchStrings": [
         "docker\\.io/library/alpine:(?<currentValue>[^']+)'"
       ]
+    },
+    {
+      "customType": "regex",
+      "description": "Keep the Python minor in the tests (version output, /opt/python/lib/python3.X paths) in sync with the pinned PYTHON_VERSION",
+      "managerFilePatterns": [
+        "/^test/python_(command_)?test\\.yml$/"
+      ],
+      "datasourceTemplate": "docker",
+      "depNameTemplate": "python",
+      "versioningTemplate": "docker",
+      "matchStrings": [
+        "[Pp]ython ?(?<currentValue>3\\.\\d+)['/]"
+      ]
+    },
+    {
+      "customType": "regex",
+      "description": "Keep the Python version in the README features list in sync with the pinned PYTHON_VERSION",
+      "managerFilePatterns": [
+        "/^README\\.md$/"
+      ],
+      "datasourceTemplate": "docker",
+      "depNameTemplate": "python",
+      "versioningTemplate": "docker",
+      "matchStrings": [
+        "\\*\\*Python (?<currentValue>3\\.\\d+\\.\\d+)\\*\\*"
+      ]
     }
   ],
   "commitMessagePrefix": "chore(deps):",

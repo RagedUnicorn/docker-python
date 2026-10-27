@@ -144,7 +144,7 @@ When manually updating the Python version:
 
 1. Update `PYTHON_VERSION` (and, if the new patch lives in a newer python-build-standalone release, `PYTHON_BUILD_STANDALONE_RELEASE`) in the Dockerfile
 2. Test the build thoroughly
-3. Update the Python minor in `test/python_test.yml` (`/opt/python/lib/python3.X` paths) and `test/python_command_test.yml`
+3. Update the Python minor in `test/python_test.yml` (`/opt/python/lib/python3.X` paths) and `test/python_command_test.yml` (Renovate does this automatically for its own bumps)
 4. Update version numbers in documentation
 
 When manually updating the Alpine version, update only the `FROM alpine:X.X.X` line — Renovate keeps the `base.name` label and metadata test aligned on its next run.
