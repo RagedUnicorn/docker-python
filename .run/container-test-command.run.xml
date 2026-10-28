@@ -5,7 +5,7 @@
         <option name="envVars">
           <list>
             <DockerEnvVarImpl>
-              <option name="name" value="PYTHON_VERSION" />
+              <option name="name" value="PYTHON_TEST_VERSION" />
               <option name="value" value="test" />
             </DockerEnvVarImpl>
           </list>

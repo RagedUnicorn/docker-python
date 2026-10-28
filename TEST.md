@@ -67,21 +67,21 @@ docker build -t ragedunicorn/python:test .
 
 ```bash
 # Run tests against your local build
-PYTHON_VERSION=test docker compose -f docker-compose.test.yml run test-all
+PYTHON_TEST_VERSION=test docker compose -f docker-compose.test.yml run test-all
 ```
 
 **Windows (PowerShell):**
 
 ```powershell
 # Run tests against your local build
-$env:PYTHON_VERSION="test"; docker compose -f docker-compose.test.yml run test-all
+$env:PYTHON_TEST_VERSION="test"; docker compose -f docker-compose.test.yml run test-all
 ```
 
 **Windows (Command Prompt):**
 
 ```cmd
 # Run tests against your local build
-set PYTHON_VERSION=test && docker compose -f docker-compose.test.yml run test-all
+set PYTHON_TEST_VERSION=test && docker compose -f docker-compose.test.yml run test-all
 ```
 
 **Why local testing is important:**
@@ -105,14 +105,14 @@ Linux/macOS:
 
 ```bash
 docker build -t ragedunicorn/python:test .
-PYTHON_VERSION=test docker compose -f docker-compose.test.yml run test-all
+PYTHON_TEST_VERSION=test docker compose -f docker-compose.test.yml run test-all
 ```
 
 Windows (PowerShell):
 
 ```powershell
 docker build -t ragedunicorn/python:test .
-$env:PYTHON_VERSION="test"; docker compose -f docker-compose.test.yml run test-all
+$env:PYTHON_TEST_VERSION="test"; docker compose -f docker-compose.test.yml run test-all
 ```
 
 ### Test Execution
@@ -123,21 +123,21 @@ Run all tests against your local build:
 
 ```bash
 # Ensure you've built locally first!
-PYTHON_VERSION=test docker compose -f docker-compose.test.yml run test-all
+PYTHON_TEST_VERSION=test docker compose -f docker-compose.test.yml run test-all
 ```
 
 **Windows (PowerShell):**
 
 ```powershell
 # Ensure you've built locally first!
-$env:PYTHON_VERSION="test"; docker compose -f docker-compose.test.yml run test-all
+$env:PYTHON_TEST_VERSION="test"; docker compose -f docker-compose.test.yml run test-all
 ```
 
 **Windows (Command Prompt):**
 
 ```cmd
 # Ensure you've built locally first!
-set PYTHON_VERSION=test && docker compose -f docker-compose.test.yml run test-all
+set PYTHON_TEST_VERSION=test && docker compose -f docker-compose.test.yml run test-all
 ```
 
 Run specific test categories:
@@ -146,26 +146,26 @@ Run specific test categories:
 
 ```bash
 # File structure and library tests
-PYTHON_VERSION=test docker compose -f docker-compose.test.yml up container-test
+PYTHON_TEST_VERSION=test docker compose -f docker-compose.test.yml up container-test
 
 # Command execution and functionality tests
-PYTHON_VERSION=test docker compose -f docker-compose.test.yml up container-test-command
+PYTHON_TEST_VERSION=test docker compose -f docker-compose.test.yml up container-test-command
 
 # Metadata and label tests
-PYTHON_VERSION=test docker compose -f docker-compose.test.yml up container-test-metadata
+PYTHON_TEST_VERSION=test docker compose -f docker-compose.test.yml up container-test-metadata
 ```
 
 **Windows (PowerShell):**
 
 ```powershell
 # File structure and library tests
-$env:PYTHON_VERSION="test"; docker compose -f docker-compose.test.yml up container-test
+$env:PYTHON_TEST_VERSION="test"; docker compose -f docker-compose.test.yml up container-test
 
 # Command execution and functionality tests
-$env:PYTHON_VERSION="test"; docker compose -f docker-compose.test.yml up container-test-command
+$env:PYTHON_TEST_VERSION="test"; docker compose -f docker-compose.test.yml up container-test-command
 
 # Metadata and label tests
-$env:PYTHON_VERSION="test"; docker compose -f docker-compose.test.yml up container-test-metadata
+$env:PYTHON_TEST_VERSION="test"; docker compose -f docker-compose.test.yml up container-test-metadata
 ```
 
 ### Testing Different Versions
@@ -181,14 +181,14 @@ docker build -t ragedunicorn/python:3-alpine3.24.0-1 .
 
 ```bash
 # Test that specific version
-PYTHON_VERSION=3-alpine3.24.0-1 docker compose -f docker-compose.test.yml run test-all
+PYTHON_TEST_VERSION=3-alpine3.24.0-1 docker compose -f docker-compose.test.yml run test-all
 ```
 
 **Windows (PowerShell):**
 
 ```powershell
 # Test that specific version
-$env:PYTHON_VERSION="3-alpine3.24.0-1"; docker compose -f docker-compose.test.yml run test-all
+$env:PYTHON_TEST_VERSION="3-alpine3.24.0-1"; docker compose -f docker-compose.test.yml run test-all
 ```
 
 ## Troubleshooting Test Failures
@@ -221,7 +221,7 @@ docker run --rm --entrypoint sh ragedunicorn/python:test -c "ls -la /opt/python/
 
 1. **Testing remote images instead of local builds**
    - Remote images (Docker Hub, GHCR) have labels overridden by CI/CD
-   - Always test your local builds with `PYTHON_VERSION=test`
+   - Always test your local builds with `PYTHON_TEST_VERSION=test`
 
 2. **Label value mismatches**
    - CI/CD systems may capitalize values (e.g., "RagedUnicorn" vs "ragedunicorn")
@@ -241,13 +241,13 @@ docker build -t ragedunicorn/python:test .
 Linux/macOS:
 
 ```bash
-PYTHON_VERSION=test docker compose -f docker-compose.test.yml run test-all
+PYTHON_TEST_VERSION=test docker compose -f docker-compose.test.yml run test-all
 ```
 
 Windows (PowerShell):
 
 ```powershell
-$env:PYTHON_VERSION="test"; docker compose -f docker-compose.test.yml run test-all
+$env:PYTHON_TEST_VERSION="test"; docker compose -f docker-compose.test.yml run test-all
 ```
 
 ### Permission Errors
@@ -301,7 +301,7 @@ Manual integration example:
 ```yaml
 - name: Run Container Structure Tests
   env:
-    PYTHON_VERSION: test
+    PYTHON_TEST_VERSION: test
   run: docker compose -f docker-compose.test.yml run test-all
 ```
 

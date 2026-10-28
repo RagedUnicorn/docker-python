@@ -32,7 +32,7 @@ jobs:
           cache-to: type=gha,mode=max
       - name: Run Container Structure Tests
         env:
-          PYTHON_VERSION: test
+          PYTHON_TEST_VERSION: test
         run: |
           echo "::notice title=🧪 Running Tests::Validating Docker image before release..."
           docker compose -f docker-compose.test.yml pull

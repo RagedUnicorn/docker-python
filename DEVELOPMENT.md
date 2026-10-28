@@ -86,30 +86,30 @@ docker build -t ragedunicorn/python:test .
 
 ```bash
 # Run all tests against your local build
-PYTHON_VERSION=test docker compose -f docker-compose.test.yml run test-all
+PYTHON_TEST_VERSION=test docker compose -f docker-compose.test.yml run test-all
 
 # Run specific tests during development
-PYTHON_VERSION=test docker compose -f docker-compose.test.yml up container-test-command
+PYTHON_TEST_VERSION=test docker compose -f docker-compose.test.yml up container-test-command
 ```
 
 **Windows Command Prompt:**
 
 ```cmd
 # Run all tests against your local build
-set PYTHON_VERSION=test && docker compose -f docker-compose.test.yml run test-all
+set PYTHON_TEST_VERSION=test && docker compose -f docker-compose.test.yml run test-all
 
 # Run specific tests during development
-set PYTHON_VERSION=test && docker compose -f docker-compose.test.yml up container-test-command
+set PYTHON_TEST_VERSION=test && docker compose -f docker-compose.test.yml up container-test-command
 ```
 
 **Windows PowerShell:**
 
 ```powershell
 # Run all tests against your local build
-$env:PYTHON_VERSION="test"; docker compose -f docker-compose.test.yml run test-all
+$env:PYTHON_TEST_VERSION="test"; docker compose -f docker-compose.test.yml run test-all
 
 # Run specific tests during development
-$env:PYTHON_VERSION="test"; docker compose -f docker-compose.test.yml up container-test-command
+$env:PYTHON_TEST_VERSION="test"; docker compose -f docker-compose.test.yml up container-test-command
 ```
 
 **Important:** Never test against remote images - they may have different labels or configurations due to CI/CD overrides.

@@ -40,7 +40,7 @@ jobs:
         continue-on-error: true
         shell: bash
         env:
-          PYTHON_VERSION: test
+          PYTHON_TEST_VERSION: test
         run: |
           echo "::group::📁 File Structure Tests"
           docker compose -f docker-compose.test.yml up --exit-code-from container-test container-test 2>&1 | tee test-file-structure.log
@@ -50,7 +50,7 @@ jobs:
         continue-on-error: true
         shell: bash
         env:
-          PYTHON_VERSION: test
+          PYTHON_TEST_VERSION: test
         run: |
           echo "::group::🔧 Command Execution Tests"
           docker compose -f docker-compose.test.yml up --exit-code-from container-test-command container-test-command 2>&1 | tee test-command-execution.log
@@ -60,7 +60,7 @@ jobs:
         continue-on-error: true
         shell: bash
         env:
-          PYTHON_VERSION: test
+          PYTHON_TEST_VERSION: test
         run: |
           echo "::group::🏷️ Metadata Tests"
           docker compose -f docker-compose.test.yml up --exit-code-from container-test-metadata container-test-metadata 2>&1 | tee test-metadata.log
