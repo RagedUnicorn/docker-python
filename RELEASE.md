@@ -32,7 +32,8 @@ When you push a tag, GitHub Actions automatically:
    - Multi-platform: linux/amd64 and linux/arm64
    - Pushes to both GitHub Container Registry and Docker Hub
 
-2. **Creates GitHub Release** (`.github/workflows/github_release.yml`)
+2. **Creates GitHub Release** (`create-release` job in `.github/workflows/docker_release.yml`)
+   - Runs only after the images were tested and pushed successfully
    - Generates changelog from commit history
    - Adds Docker pull commands
    - Links to the release
