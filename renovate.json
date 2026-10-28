@@ -72,6 +72,17 @@
     },
     {
       "customType": "regex",
+      "description": "Keep the container-structure-test harness pin in .env up to date",
+      "managerFilePatterns": [
+        "/^\\.env$/"
+      ],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>.*?) depName=(?<depName>.*?)\\s+CONTAINER_STRUCTURE_TEST_VERSION=(?<currentValue>.*)"
+      ],
+      "versioningTemplate": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-alpine[\\d.]+-(?<build>\\d+)$"
+    },
+    {
+      "customType": "regex",
       "description": "Keep the Alpine base.name OCI label in the Dockerfile in sync with the FROM version",
       "managerFilePatterns": [
         "/^Dockerfile$/"
