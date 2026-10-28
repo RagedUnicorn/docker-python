@@ -129,7 +129,7 @@ The compose configuration supports:
 2. **Development Mode**: Use the development compose file for building locally:
    ```bash
    docker compose -f docker-compose.dev.yml build
-   docker compose -f docker-compose.dev.yml run --rm python script.py
+   docker compose -f docker-compose.dev.yml run --rm --entrypoint python python-dev script.py
    ```
 
 3. **Persistent Settings**: The repository includes a `.env` file with default settings:

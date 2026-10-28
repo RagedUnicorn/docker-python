@@ -39,12 +39,16 @@ The `docker-compose.dev.yml` file provides an interactive development environmen
 # Build the image locally
 docker compose -f docker-compose.dev.yml build
 
-# Run in development mode (interactive Python shell)
-docker compose -f docker-compose.dev.yml run --rm python
+# Run in development mode (interactive /bin/sh shell)
+docker compose -f docker-compose.dev.yml run --rm python-dev
 
-# Inside the container, you can run Python manually
-docker compose -f docker-compose.dev.yml run --rm python -c "print('Hello from dev!')"
-docker compose -f docker-compose.dev.yml run --rm python script.py
+# Inside the container's shell, run Python manually
+python -c "print('Hello from dev!')"
+python script.py
+
+# Or run Python directly by overriding the dev shell entrypoint
+docker compose -f docker-compose.dev.yml run --rm --entrypoint python python-dev -c "print('Hello from dev!')"
+docker compose -f docker-compose.dev.yml run --rm --entrypoint python python-dev script.py
 ```
 
 The development mode:
