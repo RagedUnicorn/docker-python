@@ -106,7 +106,9 @@ jobs:
       - name: Get previous tag
         id: prev_tag
         run: |
-          PREV_TAG=$(git describe --tags --abbrev=0 $(git rev-list --tags --skip=1 --max-count=1) 2>/dev/null || echo "")
+          # Order by tag version, not by tagged commit, so a rebuild tag (-N bump)
+          # sharing a commit with the previous release still resolves correctly
+          PREV_TAG=$(git tag --list 'v*' --sort=-v:refname | grep -Fx -A1 "$GITHUB_REF_NAME" | sed -n 2p)
           echo "previous_tag=$PREV_TAG" >> $GITHUB_OUTPUT
       - name: Generate changelog
         id: changelog
