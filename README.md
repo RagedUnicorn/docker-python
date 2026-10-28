@@ -70,7 +70,7 @@ docker run --rm ragedunicorn/python:latest -c "print('Hello, World!')"
 
 #### Install Package and Run
 ```bash
-docker run -v $(pwd):/app ragedunicorn/python:latest /bin/sh -c "pip install requests && python script.py"
+docker run --rm -v $(pwd):/app --entrypoint /bin/sh ragedunicorn/python:latest -c "pip install requests && python script.py"
 ```
 
 #### Check Python Version
@@ -80,7 +80,7 @@ docker run --rm ragedunicorn/python:latest --version
 
 #### Run Tests
 ```bash
-docker run -v $(pwd):/app ragedunicorn/python:latest /bin/sh -c "pip install pytest && python -m pytest"
+docker run --rm -v $(pwd):/app --entrypoint /bin/sh ragedunicorn/python:latest -c "pip install pytest && python -m pytest"
 ```
 
 ## Docker Compose Usage

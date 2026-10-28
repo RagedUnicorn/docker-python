@@ -12,13 +12,13 @@ The `hello-world.py` script demonstrates basic Python functionality in the Docke
 
 ```bash
 # From the examples directory
-docker-compose run --rm hello-world
+docker compose run --rm hello-world
 
 # Or run interactively
-docker-compose run --rm python-shell
+docker compose run --rm python-shell
 
 # Run any Python file
-docker-compose run --rm python your-script.py
+docker compose run --rm python your-script.py
 ```
 
 #### Using Docker directly
@@ -57,7 +57,7 @@ If your script needs additional packages:
 
 ```bash
 # Install and run in one command
-docker run -v $(pwd):/app ragedunicorn/python:latest /bin/sh -c "pip install requests && python my-script.py"
+docker run --rm -v $(pwd):/app --entrypoint /bin/sh ragedunicorn/python:latest -c "pip install requests && python my-script.py"
 ```
 
 Or create a custom Dockerfile:

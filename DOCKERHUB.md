@@ -49,10 +49,10 @@ docker run --rm ragedunicorn/python:latest -c "print('Hello, World!')"
 ### Install packages and run commands
 ```bash
 # Install and run pytest
-docker run -v $(pwd):/app ragedunicorn/python:latest /bin/sh -c "pip install pytest && python -m pytest"
+docker run --rm -v $(pwd):/app --entrypoint /bin/sh ragedunicorn/python:latest -c "pip install pytest && python -m pytest"
 
 # Install and use Black formatter
-docker run -v $(pwd):/app ragedunicorn/python:latest /bin/sh -c "pip install black && python -m black ."
+docker run --rm -v $(pwd):/app --entrypoint /bin/sh ragedunicorn/python:latest -c "pip install black && python -m black ."
 ```
 
 ### Build a custom image
