@@ -88,6 +88,8 @@ jobs:
     permissions:
       contents: read
       packages: write
+      # Required for cosign keyless signing (GitHub OIDC token for Fulcio)
+      id-token: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -118,7 +120,10 @@ jobs:
             type=match,pattern=v(\d+)[.-].*,group=1,enable=${{ !contains(github.ref, '-rc') && !contains(github.ref, '-beta') && !contains(github.ref, '-alpha') }}
             # 'latest' tag for version tags (skipped for prereleases)
             type=raw,value=latest,enable=${{ startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '-rc') && !contains(github.ref, '-beta') && !contains(github.ref, '-alpha') }}
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v4
       - name: Build and push Docker image
+        id: build
         uses: docker/build-push-action@v7
         with:
           context: .
@@ -131,6 +136,21 @@ jobs:
           build-args: |
             BUILD_DATE=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.created'] }}
             VERSION=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
+          sbom: true
+          provenance: mode=max
+      - name: Sign images with cosign
+        env:
+          TAGS: ${{ steps.meta.outputs.tags }}
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: |
+          # Sign the pushed manifest list by digest once per registry repository.
+          # Repository names are taken from the metadata tags, which are already
+          # lowercased (GHCR rejects the mixed-case github.repository)
+          for IMAGE in $(echo "$TAGS" | sed 's/:[^:/]*$//' | sort -u); do
+            echo "::group::Signing ${IMAGE}@${DIGEST}"
+            cosign sign --yes "${IMAGE}@${DIGEST}"
+            echo "::endgroup::"
+          done
 
   create-release:
     needs: build-and-push
