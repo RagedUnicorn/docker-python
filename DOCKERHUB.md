@@ -20,6 +20,15 @@ docker run -it --rm ragedunicorn/python:latest
 docker run -v $(pwd):/app ragedunicorn/python:latest script.py
 ```
 
+On Windows, use the PowerShell form - `${PWD}` **with braces** and the colon
+inside the quotes (without braces PowerShell parses `$PWD:` as a
+scope-qualified variable, as in `$env:PATH`, and rejects the argument):
+
+```powershell
+# Run a Python script
+docker run -v "${PWD}:/app" ragedunicorn/python:latest script.py
+```
+
 ## Features
 
 - 🚀 **Small footprint**: compact runtime image built on Alpine Linux
@@ -34,6 +43,12 @@ docker run -v $(pwd):/app ragedunicorn/python:latest script.py
 ### Run a Python script
 ```bash
 docker run -v $(pwd):/app ragedunicorn/python:latest script.py
+```
+
+PowerShell:
+
+```powershell
+docker run -v "${PWD}:/app" ragedunicorn/python:latest script.py
 ```
 
 ### Interactive Python shell
@@ -53,6 +68,17 @@ docker run --rm -v $(pwd):/app --entrypoint /bin/sh ragedunicorn/python:latest -
 
 # Install and use Black formatter
 docker run --rm -v $(pwd):/app --entrypoint /bin/sh ragedunicorn/python:latest -c "pip install black && python -m black ."
+```
+
+PowerShell - single quotes keep the `sh -c` command one literal argument, so
+`&&` runs inside the container:
+
+```powershell
+# Install and run pytest
+docker run --rm -v "${PWD}:/app" --entrypoint /bin/sh ragedunicorn/python:latest -c 'pip install pytest && python -m pytest'
+
+# Install and use Black formatter
+docker run --rm -v "${PWD}:/app" --entrypoint /bin/sh ragedunicorn/python:latest -c 'pip install black && python -m black .'
 ```
 
 ### Build a custom image
@@ -95,6 +121,12 @@ The default working directory is `/app`. Mount your code here:
 
 ```bash
 docker run -v $(pwd):/app ragedunicorn/python:latest your_script.py
+```
+
+PowerShell:
+
+```powershell
+docker run -v "${PWD}:/app" ragedunicorn/python:latest your_script.py
 ```
 
 ## Links

@@ -28,6 +28,14 @@ docker compose run --rm python your-script.py
 docker run -v $(pwd)/examples:/app ragedunicorn/python:latest hello-world.py
 ```
 
+PowerShell:
+
+```powershell
+# From the repository root. Write ${PWD} with braces and keep the colon
+# inside the quotes.
+docker run -v "${PWD}/examples:/app" ragedunicorn/python:latest hello-world.py
+```
+
 ### Expected Output
 
 ```
@@ -51,6 +59,12 @@ print("Hello from my custom script!")
 docker run -v $(pwd):/app ragedunicorn/python:latest my-script.py
 ```
 
+PowerShell:
+
+```powershell
+docker run -v "${PWD}:/app" ragedunicorn/python:latest my-script.py
+```
+
 ## Installing Additional Packages
 
 If your script needs additional packages:
@@ -58,6 +72,12 @@ If your script needs additional packages:
 ```bash
 # Install and run in one command
 docker run --rm -v $(pwd):/app --entrypoint /bin/sh ragedunicorn/python:latest -c "pip install requests && python my-script.py"
+```
+
+PowerShell (single quotes keep the `sh -c` command one literal argument):
+
+```powershell
+docker run --rm -v "${PWD}:/app" --entrypoint /bin/sh ragedunicorn/python:latest -c 'pip install requests && python my-script.py'
 ```
 
 Or create a custom Dockerfile:

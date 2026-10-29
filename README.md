@@ -32,6 +32,23 @@ docker pull ragedunicorn/python:latest
 docker run -it --rm ragedunicorn/python:latest
 ```
 
+To run a script from the current directory:
+
+```bash
+docker run --rm -v $(pwd):/app ragedunicorn/python:latest script.py
+```
+
+On Windows, use the PowerShell form:
+
+```powershell
+docker run --rm -v "${PWD}:/app" ragedunicorn/python:latest script.py
+```
+
+Write `${PWD}` **with braces** and keep the colon inside the quotes - without
+braces PowerShell parses `$PWD:` as a scope-qualified variable (as in
+`$env:PATH`) and rejects the argument. See the
+[Windows (PowerShell) notes](#windows-powershell-notes) for details.
+
 For development and building from source, see [DEVELOPMENT.md](DEVELOPMENT.md).
 
 ## Usage
@@ -51,11 +68,30 @@ docker run -v $(pwd):/app ragedunicorn/python:3 [python-options]
 docker run -v $(pwd):/app ragedunicorn/python:3-alpine3.24.0-1 [python-options]
 ```
 
+PowerShell:
+
+```powershell
+# Using latest version
+docker run -v "${PWD}:/app" ragedunicorn/python:latest [python-options]
+
+# Using specific Python version (latest Alpine build)
+docker run -v "${PWD}:/app" ragedunicorn/python:3 [python-options]
+
+# Using exact version combination
+docker run -v "${PWD}:/app" ragedunicorn/python:3-alpine3.24.0-1 [python-options]
+```
+
 ### Examples
 
 #### Run Python Script
 ```bash
 docker run -v $(pwd):/app ragedunicorn/python:latest script.py
+```
+
+PowerShell:
+
+```powershell
+docker run -v "${PWD}:/app" ragedunicorn/python:latest script.py
 ```
 
 #### Interactive Python Shell
@@ -73,6 +109,12 @@ docker run --rm ragedunicorn/python:latest -c "print('Hello, World!')"
 docker run --rm -v $(pwd):/app --entrypoint /bin/sh ragedunicorn/python:latest -c "pip install requests && python script.py"
 ```
 
+PowerShell:
+
+```powershell
+docker run --rm -v "${PWD}:/app" --entrypoint /bin/sh ragedunicorn/python:latest -c 'pip install requests && python script.py'
+```
+
 #### Check Python Version
 ```bash
 docker run --rm ragedunicorn/python:latest --version
@@ -82,6 +124,53 @@ docker run --rm ragedunicorn/python:latest --version
 ```bash
 docker run --rm -v $(pwd):/app --entrypoint /bin/sh ragedunicorn/python:latest -c "pip install pytest && python -m pytest"
 ```
+
+PowerShell:
+
+```powershell
+docker run --rm -v "${PWD}:/app" --entrypoint /bin/sh ragedunicorn/python:latest -c 'pip install pytest && python -m pytest'
+```
+
+The interactive shell, `-c` code and `--version` examples above take no mount
+and run unchanged in PowerShell.
+
+### Windows (PowerShell) notes
+
+The PowerShell variants above differ from the bash ones in two ways: the
+mount is written `-v "${PWD}:/app"` instead of `-v $(pwd):/app`, and the
+`sh -c` command is wrapped in single quotes.
+
+The mount spelling matters:
+
+- Pasting the bash form into PowerShell breaks: an argument that starts with
+  `$(pwd)` ends after the subexpression, so `$(pwd):/app` reaches Docker as
+  two arguments (`C:\path` and `:/app`).
+- `"$PWD:/app"` without braces is a parse error: PowerShell reads a colon
+  after a variable as a scope qualifier (as in `$env:PATH`), and `/` is not a
+  valid variable-name character.
+- `"${PWD}:/app"` works: the braces end the variable name at `PWD`, the colon
+  stays literal, and Docker splits the resulting `C:\path:/app` on the second
+  colon because it recognises the `C:` drive prefix.
+
+The single quotes around the `sh -c` command keep it as one literal argument
+to the container's `sh`, so `&&` (and `;`) run inside the container and
+nothing in the string is expanded by PowerShell.
+
+To check what the container actually sees under `/app`, run a look-inside
+command:
+
+```powershell
+docker run --rm -v "${PWD}:/app" --entrypoint /bin/sh ragedunicorn/python:latest -c 'pwd; ls -la /app'
+```
+
+Unquoted, PowerShell would treat `;` as its own statement separator and run
+`ls -la /app` on the host.
+
+For more complex invocations where PowerShell keeps mangling arguments, the
+[stop-parsing token `--%`](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_parsing#the-stop-parsing-token)
+is an escape hatch: PowerShell passes everything after it verbatim. Nothing
+after `--%` is expanded - including `${PWD}` - so it cannot be combined with
+the mount examples above; none of the examples in this README need it.
 
 ## Docker Compose Usage
 
