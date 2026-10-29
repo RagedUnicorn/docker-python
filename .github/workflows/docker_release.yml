@@ -43,6 +43,43 @@ jobs:
           echo "::endgroup::"
 
           echo "::notice title=✅ Tests Passed::All Container Structure Tests completed successfully!"
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
+      - name: Build arm64 test image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          platforms: linux/arm64
+          load: true
+          tags: ragedunicorn/python:test-arm64
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Smoke test arm64 image
+        run: |
+          echo "::group::Running arm64 python under QEMU"
+          docker run --rm --platform linux/arm64 ragedunicorn/python:test-arm64 --version
+          ARCH=$(docker run --rm --platform linux/arm64 ragedunicorn/python:test-arm64 -c "import platform; print(platform.machine())")
+          echo "platform.machine(): $ARCH"
+          if [ "$ARCH" != "aarch64" ]; then
+            echo "::error title=❌ Wrong Architecture::platform.machine() in the arm64 image reported '$ARCH', expected aarch64"
+            exit 1
+          fi
+          echo "::endgroup::"
+
+          # An amd64 binary in the arm64 image would still run natively on the
+          # amd64 runner, so also assert the ELF e_machine of the Python
+          # interpreter is aarch64 (0xb7). The real binary is versioned
+          # (python3.X), so resolve it through the python symlink
+          echo "::group::Checking Python interpreter architecture"
+          PYTHON_BIN=$(docker run --rm --platform linux/arm64 --entrypoint readlink ragedunicorn/python:test-arm64 -f /opt/python/bin/python)
+          echo "interpreter: $PYTHON_BIN"
+          MACHINE=$(docker run --rm --platform linux/arm64 --entrypoint od ragedunicorn/python:test-arm64 -An -tx1 -j18 -N2 "$PYTHON_BIN" | tr -d ' \n')
+          echo "e_machine: $MACHINE"
+          if [ "$MACHINE" != "b700" ]; then
+            echo "::error title=❌ Wrong Architecture::$PYTHON_BIN in the arm64 image is not an aarch64 binary (e_machine=$MACHINE)"
+            exit 1
+          fi
+          echo "::endgroup::"
 
   build-and-push:
     needs: test
