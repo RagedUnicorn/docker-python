@@ -1,53 +1,9 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "description": "ignorePaths intentionally overrides the :ignoreModulesAndTests preset from config:recommended: test/ must stay visible so the metadata-test custom manager can update test/python_metadata_test.yml",
   "extends": [
-    "config:recommended"
-  ],
-  "schedule": [
-    "on monday"
-  ],
-  "timezone": "UTC",
-  "labels": [
-    "dependencies",
-    "renovate"
-  ],
-  "ignorePaths": [
-    "docker-compose.yml",
-    "docker-compose.dev.yml",
-    "docker-compose.test.yml",
-    "examples/**"
+    "github>RagedUnicorn/renovate-config"
   ],
   "packageRules": [
-    {
-      "matchCategories": [
-        "docker"
-      ],
-      "enabled": true,
-      "pinDigests": false
-    },
-    {
-      "description": "Automatically merge minor and patch updates for Alpine",
-      "matchDatasources": [
-        "docker"
-      ],
-      "matchPackageNames": [
-        "alpine"
-      ],
-      "matchUpdateTypes": [
-        "minor",
-        "patch"
-      ],
-      "automerge": true
-    },
-    {
-      "description": "Group every Alpine reference (FROM, base.name label, metadata test) into one PR",
-      "matchPackageNames": [
-        "alpine"
-      ],
-      "groupName": "alpine",
-      "groupSlug": "alpine"
-    },
     {
       "description": "Group the pinned CPython version and python-build-standalone release into one PR",
       "matchPackageNames": [
@@ -59,54 +15,6 @@
     }
   ],
   "customManagers": [
-    {
-      "customType": "regex",
-      "description": "Update versions pinned via renovate comments before ARG lines in the Dockerfile",
-      "managerFilePatterns": [
-        "/^Dockerfile$/"
-      ],
-      "matchStrings": [
-        "# renovate: datasource=(?<datasource>.*?) depName=(?<depName>.*?)(?: versioning=(?<versioning>.*?))?\\s+ARG .*?=(?<currentValue>.*)"
-      ],
-      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}"
-    },
-    {
-      "customType": "regex",
-      "description": "Keep the container-structure-test harness pin in .env up to date",
-      "managerFilePatterns": [
-        "/^\\.env$/"
-      ],
-      "matchStrings": [
-        "# renovate: datasource=(?<datasource>.*?) depName=(?<depName>.*?)\\s+CONTAINER_STRUCTURE_TEST_VERSION=(?<currentValue>.*)"
-      ],
-      "versioningTemplate": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)-alpine[\\d.]+-(?<build>\\d+)$"
-    },
-    {
-      "customType": "regex",
-      "description": "Keep the Alpine base.name OCI label in the Dockerfile in sync with the FROM version",
-      "managerFilePatterns": [
-        "/^Dockerfile$/"
-      ],
-      "datasourceTemplate": "docker",
-      "depNameTemplate": "alpine",
-      "versioningTemplate": "docker",
-      "matchStrings": [
-        "image\\.base\\.name=\"docker\\.io/library/alpine:(?<currentValue>[^\"]+)\""
-      ]
-    },
-    {
-      "customType": "regex",
-      "description": "Keep the Alpine version in the metadata test in sync with the FROM version",
-      "managerFilePatterns": [
-        "/^test/python_metadata_test\\.yml$/"
-      ],
-      "datasourceTemplate": "docker",
-      "depNameTemplate": "alpine",
-      "versioningTemplate": "docker",
-      "matchStrings": [
-        "docker\\.io/library/alpine:(?<currentValue>[^']+)'"
-      ]
-    },
     {
       "customType": "regex",
       "description": "Keep the Python minor in the tests (version output, /opt/python/lib/python3.X paths) in sync with the pinned PYTHON_VERSION",
