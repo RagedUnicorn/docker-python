@@ -20,7 +20,7 @@ jobs:
         run: |
           # The Dockerfile is the single, Renovate-managed source of the Python
           # and Alpine versions. Concrete versions in the docs drift, so use
-          # placeholders (<python-major>) or the symbolic N-alpineA.B.C-<build> form
+          # placeholders (<python-major>) or the symbolic X-alpineA.B.C-N form
           pattern='[0-9]+(\.[0-9]+)*-alpine[0-9]|alpine:[0-9]|--build-arg [A-Z_]*VERSION=[0-9]|ragedunicorn/[a-z0-9-]+:[0-9]'
           hits=$(git ls-files -z -- '*.md' | xargs -0 grep -HnE "$pattern" || true)
           if [ -n "$hits" ]; then

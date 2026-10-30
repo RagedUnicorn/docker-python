@@ -20,11 +20,11 @@ See [README.md](README.md#versioning) for the complete versioning documentation.
 
 **Format:** `v{python_major_version}-alpine{alpine_version}-{build_number}`
 
-Examples (`N` is the Python major version, `A.B.C` the Alpine version):
-- `vN-alpineA.B.C-1` - Initial release
-- `vN-alpineA.B.C-2` - Rebuild with same versions
-- `vN-alpineA.B.D-1` - Alpine update (build resets to 1)
-- `vN-alpineA.B+1.0-1` - Major Alpine update (build resets to 1)
+Examples (`X` is the Python major version, `A.B.C` the Alpine version):
+- `vX-alpineA.B.C-1` - Initial release
+- `vX-alpineA.B.C-2` - Rebuild with same versions
+- `vX-alpineA.B.D-1` - Alpine update (build resets to 1)
+- `vX-alpineA.B+1.0-1` - Alpine minor update (build resets to 1)
 
 ## Release Workflow
 
@@ -107,7 +107,7 @@ Before creating a release:
 
 ### Release didn't trigger
 
-- Ensure tag starts with `v` and follows the format (e.g., `vN-alpineA.B.C-<build>`)
+- Ensure tag starts with `v` and follows the format (e.g., `vX-alpineA.B.C-N`)
 - Check GitHub Actions tab for workflow runs
 - Verify you have push permissions
 
@@ -146,7 +146,7 @@ If automation fails, you can create a release manually:
 
 1. Go to repository's "Releases" page
 2. Click "Create a new release"
-3. Choose your tag (must follow format: `vN-alpineA.B.C-<build>`)
+3. Choose your tag (must follow format: `vX-alpineA.B.C-N`)
 4. Add release notes
 5. Include Docker pull commands (the tag without the leading `v`):
    ```

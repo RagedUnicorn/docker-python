@@ -104,12 +104,12 @@ This image uses semantic versioning that includes all component versions:
 
 ### Version Examples
 
-`N` is the Python major version, `A.B.C` the Alpine version:
+`X` is the Python major version, `A.B.C` the Alpine version:
 
-- `N-alpineA.B.C-1` - Initial release with Python N and Alpine A.B.C
-- `N-alpineA.B.C-2` - Rebuild of same versions (bug fixes, security patches)
-- `N-alpineA.B.D-1` - Alpine Linux patch update
-- `N` - Most recent build of Python N
+- `X-alpineA.B.C-1` - Initial release with Python X and Alpine A.B.C
+- `X-alpineA.B.C-2` - Rebuild of same versions (bug fixes, security patches)
+- `X-alpineA.B.D-1` - Alpine Linux patch update
+- `X` - Most recent build of Python X
 - `latest` - Most recent stable release
 
 The available versions are listed in the [Tags tab](https://hub.docker.com/r/ragedunicorn/python/tags).

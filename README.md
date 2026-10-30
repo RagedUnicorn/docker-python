@@ -254,9 +254,9 @@ This project uses semantic versioning that matches the Docker image contents:
 
 **Format:** `{python_major_version}-alpine{alpine_version}-{build_number}`
 
-Examples (`N` is the Python major version, `A.B.C` the Alpine version):
-- `N-alpineA.B.C-1` - Python N on Alpine A.B.C, build 1
-- `N` - Most recent build of Python N
+Examples (`X` is the Python major version, `A.B.C` the Alpine version):
+- `X-alpineA.B.C-1` - Python X on Alpine A.B.C, build 1
+- `X` - Most recent build of Python X
 - `latest` - Most recent stable release
 
 The current tags are listed on [Docker Hub](https://hub.docker.com/r/ragedunicorn/python/tags).
