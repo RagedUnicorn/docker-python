@@ -17,7 +17,7 @@ This Docker image provides a minimal Python installation built on Alpine Linux. 
 ## Features
 
 - **Small footprint**: compact runtime image using Alpine Linux
-- **Python 3.15.2**: pinned standalone CPython
+- **Pinned CPython**: standalone CPython at the version pinned in the `Dockerfile` (see the [releases](https://github.com/RagedUnicorn/docker-python/releases))
 - **Minimal installation**: Only Python and pip included
 - **Non-root user**: Enhanced security with dedicated python user
 - **Volume mounting**: Easy code and data access through `/app`
@@ -62,10 +62,10 @@ The container uses Python as the entrypoint, so any Python parameters can be pas
 docker run -v $(pwd):/app ragedunicorn/python:latest [python-options]
 
 # Using specific Python version (latest Alpine build)
-docker run -v $(pwd):/app ragedunicorn/python:3 [python-options]
+docker run -v $(pwd):/app ragedunicorn/python:<python-major> [python-options]
 
 # Using exact version combination
-docker run -v $(pwd):/app ragedunicorn/python:3-alpine3.24.0-1 [python-options]
+docker run -v $(pwd):/app ragedunicorn/python:<python-major>-alpine<alpine-version>-<build> [python-options]
 ```
 
 PowerShell:
@@ -75,11 +75,14 @@ PowerShell:
 docker run -v "${PWD}:/app" ragedunicorn/python:latest [python-options]
 
 # Using specific Python version (latest Alpine build)
-docker run -v "${PWD}:/app" ragedunicorn/python:3 [python-options]
+docker run -v "${PWD}:/app" ragedunicorn/python:<python-major> [python-options]
 
 # Using exact version combination
-docker run -v "${PWD}:/app" ragedunicorn/python:3-alpine3.24.0-1 [python-options]
+docker run -v "${PWD}:/app" ragedunicorn/python:<python-major>-alpine<alpine-version>-<build> [python-options]
 ```
+
+Available tags are listed on [Docker Hub](https://hub.docker.com/r/ragedunicorn/python/tags) and in the
+[GitHub releases](https://github.com/RagedUnicorn/docker-python/releases).
 
 ### Examples
 
@@ -251,9 +254,12 @@ This project uses semantic versioning that matches the Docker image contents:
 
 **Format:** `{python_major_version}-alpine{alpine_version}-{build_number}`
 
-Examples:
-- `3-alpine3.24.0-1` - Python 3 on Alpine 3.24.0, build 1
+Examples (`N` is the Python major version, `A.B.C` the Alpine version):
+- `N-alpineA.B.C-1` - Python N on Alpine A.B.C, build 1
+- `N` - Most recent build of Python N
 - `latest` - Most recent stable release
+
+The current tags are listed on [Docker Hub](https://hub.docker.com/r/ragedunicorn/python/tags).
 
 For detailed release process and versioning guidelines, see [RELEASE.md](RELEASE.md).
 

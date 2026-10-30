@@ -10,8 +10,8 @@ A minimal Python image on Alpine Linux, shipping a pinned standalone CPython dec
 # Pull latest version
 docker pull ragedunicorn/python:latest
 
-# Or pull specific version
-docker pull ragedunicorn/python:3-alpine3.24.0-1
+# Or pull specific version (see the Tags tab for the available versions)
+docker pull ragedunicorn/python:<python-major>-alpine<alpine-version>-<build>
 
 # Run Python interactively
 docker run -it --rm ragedunicorn/python:latest
@@ -104,10 +104,15 @@ This image uses semantic versioning that includes all component versions:
 
 ### Version Examples
 
-- `3-alpine3.24.0-1` - Initial release with Python 3 and Alpine 3.24.0
-- `3-alpine3.24.0-2` - Rebuild of same versions (bug fixes, security patches)
-- `3-alpine3.24.1-1` - Alpine Linux patch update
+`N` is the Python major version, `A.B.C` the Alpine version:
+
+- `N-alpineA.B.C-1` - Initial release with Python N and Alpine A.B.C
+- `N-alpineA.B.C-2` - Rebuild of same versions (bug fixes, security patches)
+- `N-alpineA.B.D-1` - Alpine Linux patch update
+- `N` - Most recent build of Python N
 - `latest` - Most recent stable release
+
+The available versions are listed in the [Tags tab](https://hub.docker.com/r/ragedunicorn/python/tags).
 
 The pinned CPython patch version is fixed per release and updated independently of Alpine. When updates are available through automated dependency management, new releases are created with appropriate version tags.
 

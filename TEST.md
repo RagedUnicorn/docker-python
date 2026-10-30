@@ -174,21 +174,21 @@ When testing different versions, always build locally first:
 
 ```bash
 # Build a specific version locally
-docker build -t ragedunicorn/python:3-alpine3.24.0-1 .
+docker build -t ragedunicorn/python:<python-major>-alpine<alpine-version>-<build> .
 ```
 
 **Linux/macOS:**
 
 ```bash
 # Test that specific version
-PYTHON_TEST_VERSION=3-alpine3.24.0-1 docker compose -f docker-compose.test.yml run test-all
+PYTHON_TEST_VERSION=<python-major>-alpine<alpine-version>-<build> docker compose -f docker-compose.test.yml run test-all
 ```
 
 **Windows (PowerShell):**
 
 ```powershell
 # Test that specific version
-$env:PYTHON_TEST_VERSION="3-alpine3.24.0-1"; docker compose -f docker-compose.test.yml run test-all
+$env:PYTHON_TEST_VERSION="<python-major>-alpine<alpine-version>-<build>"; docker compose -f docker-compose.test.yml run test-all
 ```
 
 ## Troubleshooting Test Failures

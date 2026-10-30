@@ -63,17 +63,21 @@ The development mode:
 # Basic build
 docker build -t ragedunicorn/python:dev .
 
-# Build with specific versions
+# Build with version metadata (Python and Alpine come from the Dockerfile)
 docker build \
   --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
-  --build-arg VERSION=3-alpine3.24.0-1 \
-  -t ragedunicorn/python:3-alpine3.24.0-1 .
+  --build-arg VERSION=dev \
+  -t ragedunicorn/python:dev .
 
 # Multi-platform build (requires buildx)
 docker buildx build \
   --platform linux/amd64,linux/arm64 \
   -t ragedunicorn/python:dev .
 ```
+
+The Python version is the `PYTHON_VERSION` default in the `Dockerfile` and the
+Alpine version is its `FROM` line. Renovate keeps both current, so the docs do
+not repeat them.
 
 ### 3. Testing Your Changes
 
@@ -141,7 +145,7 @@ Manual version updates are rarely needed. Because the Python version is pinned i
 ```dockerfile
 # Pinned CPython version (fetched from python-build-standalone)
 # renovate: datasource=docker depName=python versioning=docker
-ARG PYTHON_VERSION=3.14.6
+ARG PYTHON_VERSION=<python-version>
 ```
 
 When manually updating the Python version:
@@ -149,7 +153,6 @@ When manually updating the Python version:
 1. Update `PYTHON_VERSION` (and, if the new patch lives in a newer python-build-standalone release, `PYTHON_BUILD_STANDALONE_RELEASE`) in the Dockerfile
 2. Test the build thoroughly
 3. Update the Python minor in `test/python_test.yml` (`/opt/python/lib/python3.X` paths) and `test/python_command_test.yml` (Renovate does this automatically for its own bumps)
-4. Update version numbers in documentation
 
 When manually updating the Alpine version, update only the `FROM alpine:X.X.X` line — Renovate keeps the `base.name` label and metadata test aligned on its next run.
 

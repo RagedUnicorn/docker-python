@@ -27,19 +27,6 @@
       "matchStrings": [
         "[Pp]ython ?(?<currentValue>3\\.\\d+)['/]"
       ]
-    },
-    {
-      "customType": "regex",
-      "description": "Keep the Python version in the README features list in sync with the pinned PYTHON_VERSION",
-      "managerFilePatterns": [
-        "/^README\\.md$/"
-      ],
-      "datasourceTemplate": "docker",
-      "depNameTemplate": "python",
-      "versioningTemplate": "docker",
-      "matchStrings": [
-        "\\*\\*Python (?<currentValue>3\\.\\d+\\.\\d+)\\*\\*"
-      ]
     }
   ],
   "commitMessagePrefix": "chore(deps):",
