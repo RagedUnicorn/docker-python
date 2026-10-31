@@ -40,6 +40,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
       - name: Build Python image
+        id: build
         uses: docker/build-push-action@v7
         with:
           context: .
@@ -57,6 +58,15 @@ jobs:
           build-args: |
             BUILD_DATE=${{ github.event.repository.updated_at }}
             VERSION=test
+      - name: Capture build failure log
+        # build-push-action exposes no error output, so rerun the build with
+        # plain progress for the summary. The builder still holds the layers
+        # up to the failing step, so only that step runs again.
+        if: failure() && steps.build.outcome == 'failure'
+        shell: bash
+        run: |
+          docker buildx build --progress=plain --platform linux/amd64 \
+            --build-arg VERSION=test . > build.log 2>&1 || true
       - name: Pull Container Structure Test image
         run: docker compose -f docker-compose.test.yml pull
       - name: Run File Structure Tests
@@ -108,56 +118,133 @@ jobs:
           echo "::endgroup::"
       - name: Generate Test Summary
         if: always()
+        shell: bash
+        env:
+          BUILD_OUTCOME: ${{ steps.build.outcome }}
+          FILE_OUTCOME: ${{ steps.file-tests.outcome }}
+          COMMAND_OUTCOME: ${{ steps.command-tests.outcome }}
+          METADATA_OUTCOME: ${{ steps.metadata-tests.outcome }}
+          BASIC_OUTCOME: ${{ steps.basic-tests.outcome }}
         run: |
-          echo "## 📊 Test Results Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Test Suite | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|------------|--------|" >> $GITHUB_STEP_SUMMARY
+          # Strip ANSI colours and the docker compose "service-1  | " prefix
+          clean() { sed -E 's/\x1b\[[0-9;]*m//g; s/^[a-z0-9_-]+-[0-9]+ +\| ?//' "$1"; }
 
-          if [ "${{ steps.file-tests.outcome }}" == "success" ]; then
-            echo "| 📁 File Structure | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "| 📁 File Structure | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
-          fi
+          # Keep only the failing container-structure-test blocks plus the totals
+          cst_failures() {
+            clean "$1" | awk '
+              /^=== RUN:/ { if (fail) printf "%s", blk; blk = $0 "\n"; fail = 0; inblk = 1; next }
+              /^=====/ { if (fail) printf "%s", blk; blk = ""; fail = 0; inblk = 0; next }
+              /^(Passes|Failures|Total tests):/ { tot = tot $0 "\n"; next }
+              /^duration:/ { next }
+              inblk { blk = blk $0 "\n"; if ($0 ~ /^--- FAIL/) fail = 1 }
+              END { if (fail) printf "%s", blk; if (tot != "") printf "\n%s", tot }'
+          }
 
-          if [ "${{ steps.command-tests.outcome }}" == "success" ]; then
-            echo "| 🔧 Command Execution | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "| 🔧 Command Execution | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
-          fi
+          # Output of the build step that failed, from the plain-progress rerun
+          build_failure() {
+            local step
+            step=$(grep -oE '^#[0-9]+ ERROR' build.log | head -n 1 | cut -d' ' -f1)
+            if [ -n "$step" ]; then
+              grep "^$step " build.log | tail -n 60
+            else
+              tail -n 60 build.log
+            fi
+          }
 
-          if [ "${{ steps.metadata-tests.outcome }}" == "success" ]; then
-            echo "| 🏷️ Metadata | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "| 🏷️ Metadata | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
-          fi
+          # Failure output of one suite: extracted text, else the log tail
+          excerpt() {
+            local kind=$1 log=$2 text=""
+            [ -f "$log" ] || return 0
+            case "$kind" in
+              cst) text=$(cst_failures "$log") ;;
+              build) text=$(build_failure) ;;
+            esac
+            [ -n "$text" ] || text=$(clean "$log" | tail -n 60)
+            printf '%s\n' "$text"
+          }
 
-          if [ "${{ steps.basic-tests.outcome }}" == "success" ]; then
-            echo "| 🐍 Basic Functionality | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "| 🐍 Basic Functionality | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
-          fi
+          details() {
+            local title=$1 body=$2 lines
+            [ -n "$body" ] || return 0
+            lines=$(printf '%s\n' "$body" | wc -l)
+            echo "<details open><summary>❌ ${title} — failure output</summary>"
+            echo ""
+            echo '```text'
+            printf '%s\n' "$body" | head -n 100
+            if [ "$lines" -gt 100 ]; then
+              echo "… $((lines - 100)) more lines, see the test-logs artifact"
+            fi
+            echo '```'
+            echo ""
+            echo "</details>"
+            echo ""
+          }
 
-          echo "" >> $GITHUB_STEP_SUMMARY
+          status() {
+            case "$1" in
+              success) echo "✅ Passed" ;;
+              failure) echo "❌ Failed" ;;
+              skipped) echo "⏭️ Skipped" ;;
+              cancelled) echo "🚫 Cancelled" ;;
+              *) echo "❔ ${1:-Not run}" ;;
+            esac
+          }
 
-          # Overall status
-          if [ "${{ steps.file-tests.outcome }}" == "success" ] && \
-             [ "${{ steps.command-tests.outcome }}" == "success" ] && \
-             [ "${{ steps.metadata-tests.outcome }}" == "success" ] && \
-             [ "${{ steps.basic-tests.outcome }}" == "success" ]; then
-            echo "### ✅ All tests passed successfully!" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "### ❌ Some tests failed. Check the logs for details." >> $GITHUB_STEP_SUMMARY
+          # name|outcome|excerpt kind|log file
+          suites=(
+            "🏗️ Image build|$BUILD_OUTCOME|build|build.log"
+            "📁 File Structure|$FILE_OUTCOME|cst|test-file-structure.log"
+            "🔧 Command Execution|$COMMAND_OUTCOME|cst|test-command-execution.log"
+            "🏷️ Metadata|$METADATA_OUTCOME|cst|test-metadata.log"
+            "🐍 Basic Functionality|$BASIC_OUTCOME|tail|test-basic-functionality.log"
+          )
+
+          failed=0
+          {
+            echo "## 📊 Test Results Summary"
+            echo ""
+            echo "| Test Suite | Status |"
+            echo "|------------|--------|"
+            for suite in "${suites[@]}"; do
+              IFS='|' read -r name outcome _ _ <<< "$suite"
+              echo "| ${name} | $(status "$outcome") |"
+            done
+            echo ""
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          for suite in "${suites[@]}"; do
+            IFS='|' read -r name outcome kind log <<< "$suite"
+            [ "$outcome" == "failure" ] || continue
+            failed=$((failed + 1))
+            text=$(excerpt "$kind" "$log")
+            details "$name" "$text" >> "$GITHUB_STEP_SUMMARY"
+            # Surface the first error line as an annotation on the run page
+            first=$(printf '%s\n' "$text" | grep -m 1 -E '^(Error|ERROR)|ERROR:' | sed -E 's/^#[0-9]+ ([0-9.]+ )?//' || true)
+            title=$(printf '%s' "$name" | sed -E 's/^[^A-Za-z]+//')
+            echo "::error title=${title} failed::${first:-see the job summary}"
+          done
+
+          if [ "$BUILD_OUTCOME" != "success" ]; then
+            echo "### ❌ Image build failed — test suites were skipped" >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          elif [ "$failed" -gt 0 ]; then
+            echo "### ❌ ${failed} test suite(s) failed — see the output above" >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          elif [ "$FILE_OUTCOME$COMMAND_OUTCOME$METADATA_OUTCOME$BASIC_OUTCOME" != "successsuccesssuccesssuccess" ]; then
+            echo "### ❌ Some test suites did not run" >> "$GITHUB_STEP_SUMMARY"
             exit 1
           fi
+          echo "### ✅ All tests passed successfully!" >> "$GITHUB_STEP_SUMMARY"
       - name: Upload test logs
-        if: always() && (steps.file-tests.outcome == 'failure' || steps.command-tests.outcome == 'failure' || steps.metadata-tests.outcome == 'failure' || steps.basic-tests.outcome == 'failure')
+        if: always() && (steps.build.outcome == 'failure' || steps.file-tests.outcome == 'failure' || steps.command-tests.outcome == 'failure' || steps.metadata-tests.outcome == 'failure' || steps.basic-tests.outcome == 'failure')
         uses: actions/upload-artifact@v7
         with:
           name: test-logs
           path: |
+            build.log
             test-file-structure.log
             test-command-execution.log
             test-metadata.log
             test-basic-functionality.log
+          if-no-files-found: ignore
           retention-days: 7
