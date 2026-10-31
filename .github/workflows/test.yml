@@ -220,6 +220,8 @@ jobs:
             details "$name" "$text" >> "$GITHUB_STEP_SUMMARY"
             # Surface the first error line as an annotation on the run page
             first=$(printf '%s\n' "$text" | grep -m 1 -E '^(Error|ERROR)|ERROR:' | sed -E 's/^#[0-9]+ ([0-9.]+ )?//' || true)
+            # No error-looking line: fall back to the last line of the output
+            [ -n "$first" ] || first=$(printf '%s\n' "$text" | grep -v '^[[:space:]]*$' | tail -n 1 || true)
             title=$(printf '%s' "$name" | sed -E 's/^[^A-Za-z]+//')
             echo "::error title=${title} failed::${first:-see the job summary}"
           done
