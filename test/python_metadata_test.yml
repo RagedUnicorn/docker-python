@@ -14,7 +14,7 @@ metadataTest:
     - key: 'org.opencontainers.image.licenses'
       value: 'MIT'
     - key: 'org.opencontainers.image.base.name'
-      value: 'docker.io/library/alpine:3.24.3'
+      value: 'docker.io/library/alpine:3.24.4'
 
   entrypoint: ['python']
   cmd: ['-i']
